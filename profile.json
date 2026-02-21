@@ -1,0 +1,23 @@
+{
+  "name": "John Doe",
+  "age": "75",
+  "gender": "male",
+  "address": "",
+  "medical_conditions": "Diabetes, Early-stage Dementia",
+  "hobbies": "Gardening",
+  "notes": "I like early mornings",
+  "emergency_contacts": [
+    {
+      "name": "Jane Doe",
+      "relation": "Wife",
+      "phone": "555-0199",
+      "address": ""
+    }
+  ],
+  "doctors": [],
+  "preferences": {
+    "voice_speed": "normal",
+    "font_size": "normal",
+    "theme": "ocean"
+  }
+}

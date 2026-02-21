@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - AI Chat Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="header-content">
+                    <div class="header-text">
+                        <a href="/" class="back-link">← Back to Chat</a>
+                        <h1>My Profile</h1>
+                        <p class="status">Personal Information</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="tabs-nav">
+                    <button class="tab-btn active" onclick="switchTab('profile')">
+                        <i data-lucide="user"></i> Profile
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('routines', event)">
+                        <i data-lucide="clock"></i> Daily Routines
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('memories', event)">
+                        <i data-lucide="camera"></i> Memories
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('family', event)">
+                        <i data-lucide="users"></i> Family
+                    </button>
+                </div>
+
+                <div id="profile-tab" class="tab-content active">
+                    <form id="profileForm">
+                        <div class="form-section">
+                            <h2><i data-lucide="user"></i> Basic Information</h2>
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <div class="input-with-icon">
+                                    <i data-lucide="user" class="field-icon"></i>
+                                    <input type="text" id="name" name="name" placeholder="E.g. John Doe">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="age">Age</label>
+                                    <div class="input-with-icon">
+                                        <i data-lucide="calendar" class="field-icon"></i>
+                                        <input type="number" id="age" name="age" placeholder="Age">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="gender">Gender</label>
+                                    <div class="input-with-icon">
+                                        <i data-lucide="users" class="field-icon"></i>
+                                        <select id="gender" name="gender">
+                                            <option value="">Select Gender...</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                            <option value="other">Other</option>
+                                            <option value="prefer_not_to_say">Prefer not to say</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h2><i data-lucide="heart-pulse"></i> Health & Contact</h2>
+                            <div class="form-group">
+                                <label for="medical_conditions">Medical Conditions</label>
+                                <div class="input-with-icon textarea-wrapper">
+                                    <i data-lucide="activity" class="field-icon"></i>
+                                    <textarea id="medical_conditions" name="medical_conditions" rows="2"
+                                        placeholder="Any medical conditions, allergies, or medications..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="emergency_contact">Emergency Contact</label>
+                                <div class="input-with-icon">
+                                    <i data-lucide="phone" class="field-icon"></i>
+                                    <input type="text" id="emergency_contact" name="emergency_contact"
+                                        placeholder="Name and Phone Number">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h2><i data-lucide="smile"></i> Personal Details</h2>
+                            <div class="form-group">
+                                <label for="hobbies">Hobbies & Interests</label>
+                                <div class="input-with-icon textarea-wrapper">
+                                    <i data-lucide="music" class="field-icon"></i>
+                                    <textarea id="hobbies" name="hobbies" rows="2"
+                                        placeholder="What do you enjoy doing? (e.g. Gardening, Chess)"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="notes">Additional Notes</label>
+                                <div class="input-with-icon textarea-wrapper">
+                                    <i data-lucide="sticky-note" class="field-icon"></i>
+                                    <textarea id="notes" name="notes" rows="2"
+                                        placeholder="Anything else you'd like me to remember?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="save-button">
+                                <i data-lucide="save"></i> Save Profile
+                            </button>
+                        </div>
+                        <div id="saveMessage" class="save-message"></div>
+                    </form>
+                </div>
+
+                <div id="routines-tab" class="tab-content">
+                    <div class="routines-control-bar">
+                        <div class="view-toggle">
+                            <button class="toggle-btn active" id="viewToday"
+                                onclick="filterRoutines('today')">Today</button>
+                            <button class="toggle-btn" id="viewAll" onclick="filterRoutines('all')">All
+                                Routines</button>
+                        </div>
+                        <button class="add-routine-btn" onclick="openRoutineModal()">
+                            <i data-lucide="plus"></i> Add Routine
+                        </button>
+                    </div>
+
+                    <div class="routines-list" id="routinesList">
+                        <!-- Routines will be populated here -->
+                    </div>
+                </div>
+                <div id="memories-tab" class="tab-content">
+                    <div class="routines-control-bar">
+                        <h2 style="color:white; font-size:1.2rem; margin:0;">My Memories</h2>
+                        <button class="add-routine-btn" onclick="openMemoryModal()">
+                            <i data-lucide="plus"></i> Add Memory
+                        </button>
+                    </div>
+
+                    <div class="memories-grid" id="memoriesList">
+                        <!-- Memories will be populated here -->
+                    </div>
+                </div>
+
+                <div id="family-tab" class="tab-content">
+                    <div class="routines-control-bar">
+                        <h2 style="color:white; font-size:1.2rem; margin:0;">Family Members</h2>
+                        <button class="add-routine-btn" onclick="openFamilyModal()">
+                            <i data-lucide="plus"></i> Add Family Member
+                        </button>
+                    </div>
+
+                    <div class="memories-grid" id="familyList">
+                        <!-- Family members will be populated here (reusing grid class) -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Memory Modal -->
+    <div id="memoryModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="memoryModalTitle">Add Memory</h2>
+                <button class="close-modal" onclick="closeMemoryModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="memoryForm">
+                    <input type="hidden" id="memoryId">
+                    <div class="form-group">
+                        <label for="memoryTitle">Title *</label>
+                        <input type="text" id="memoryTitle" required placeholder="e.g. Summer Vacation 2024">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memoryDate">Date</label>
+                        <input type="date" id="memoryDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memoryDesc">Description</label>
+                        <textarea id="memoryDesc" rows="3" placeholder="What happened?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memoryMedia">Photo/Video</label>
+                        <input type="file" id="memoryMedia" accept="image/*,video/*">
+                    </div>
+
+                    <!-- Add/Edit Family Modal -->
+                    <div id="familyModal" class="modal-overlay">
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h2 id="familyModalTitle">Add Family Member</h2>
+                                <button class="close-modal" onclick="closeFamilyModal()">
+                                    <i data-lucide="x"></i>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="familyForm">
+                                    <input type="hidden" id="familyId">
+                                    <div class="form-group">
+                                        <label for="familyName">Name *</label>
+                                        <input type="text" id="familyName" required placeholder="E.g. Jane Doe"
+                                            autocomplete="name">
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="familyRelation">Relationship *</label>
+                                            <input type="text" id="familyRelation" required placeholder="E.g. Sister"
+                                                autocomplete="off">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="familyDate">Important Date</label>
+                                            <input type="date" id="familyDate" title="Birthday or Anniversary"
+                                                autocomplete="bday">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="familyContact">Contact Info</label>
+                                        <input type="text" id="familyContact" placeholder="Phone, Email, or Address"
+                                            autocomplete="tel">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="familyNotes">Notes</label>
+                                        <textarea id="familyNotes" rows="2" placeholder="Likes, dislikes, stories..."
+                                            autocomplete="off"></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="familyMedia">Photo</label>
+                                        <input type="file" id="familyMedia" accept="image/*" autocomplete="off">
+                                    </div>
+
+                                    <div class="modal-actions">
+                                        <button type="button" class="cancel-btn"
+                                            onclick="closeFamilyModal()">Cancel</button>
+                                        <button type="submit" class="save-button">Save Member</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Routine Modal -->
+        <div id="routineModal" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Add Routine</h2>
+                    <button class="close-modal" onclick="closeRoutineModal()">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="routineForm">
+                        <input type="hidden" id="routineId">
+                        <div class="form-group">
+                            <label for="routineTitle">Routine Name</label>
+                            <input type="text" id="routineTitle" required placeholder="e.g. Take Medication">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="routineDesc">Description (Optional)</label>
+                            <textarea id="routineDesc" rows="2" placeholder="Details..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="routineMedia">Media (Image/Video)</label>
+                            <input type="file" id="routineMedia" accept="image/*,video/*">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="routineTime">Time *</label>
+                                <input type="time" id="routineTime" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="routineReminder">Reminder</label>
+                                <select id="routineReminder">
+                                    <option value="0">None</option>
+                                    <option value="5">5 minutes before</option>
+                                    <option value="10">10 minutes before</option>
+                                    <option value="15">15 minutes before</option>
+                                    <option value="30">30 minutes before</option>
+                                    <option value="60">1 hour before</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Days of Week *</label>
+                            <div class="day-selector" id="daySelector">
+                                <button type="button" class="day-btn" data-day="Mon"
+                                    onclick="toggleDay(this)">Mo</button>
+                                <button type="button" class="day-btn" data-day="Tue"
+                                    onclick="toggleDay(this)">Tu</button>
+                                <button type="button" class="day-btn" data-day="Wed"
+                                    onclick="toggleDay(this)">We</button>
+                                <button type="button" class="day-btn" data-day="Thu"
+                                    onclick="toggleDay(this)">Th</button>
+                                <button type="button" class="day-btn" data-day="Fri"
+                                    onclick="toggleDay(this)">Fr</button>
+                                <button type="button" class="day-btn" data-day="Sat"
+                                    onclick="toggleDay(this)">Sa</button>
+                                <button type="button" class="day-btn" data-day="Sun"
+                                    onclick="toggleDay(this)">Su</button>
+                            </div>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button type="button" class="cancel-btn" onclick="closeRoutineModal()">Cancel</button>
+                            <button type="submit" class="save-button">Save Routine</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <script src="script.js"></script>
+        <script>
+            // Initialize Lucide icons
+            lucide.createIcons();
+
+            let allRoutines = [];
+            let allMemories = [];
+            let allFamily = [];
+            let currentView = 'today';
+
+            // Load data when page loads
+            document.addEventListener('DOMContentLoaded', async () => {
+                await loadProfile();
+                await loadRoutines();
+                await loadMemories();
+                await loadFamily();
+            });
+
+            // Tab Switching
+            function switchTab(tabName, event) {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                if (event && event.currentTarget) {
+                    event.currentTarget.classList.add('active');
+                } else {
+                    // Fallback if event is not passed (e.g., if called programmatically)
+                    const btn = document.querySelector(`.tab-btn[onclick*="switchTab('${tabName}')"]`);
+                    if (btn) btn.classList.add('active');
+                }
+
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+            }
+
+            // Handle form submissions
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveProfile();
+            });
+
+            document.getElementById('routineForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveRoutine();
+            });
+
+            document.getElementById('memoryForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveMemory();
+            });
+
+            document.getElementById('familyForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveFamily();
+            });
+
+            async function loadProfile() {
+                try {
+                    const response = await fetch('/api/profile');
+                    if (response.ok) {
+                        const data = await response.json();
+                        document.getElementById('name').value = data.name || '';
+                        document.getElementById('age').value = data.age || '';
+                        document.getElementById('gender').value = data.gender || '';
+                        document.getElementById('medical_conditions').value = data.medical_conditions || '';
+                        document.getElementById('emergency_contact').value = data.emergency_contact || '';
+                        document.getElementById('hobbies').value = data.hobbies || '';
+                        document.getElementById('notes').value = data.notes || '';
+                    }
+                } catch (error) {
+                    console.error('Error loading profile:', error);
+                }
+            }
+
+            async function saveProfile() {
+                const formData = {
+                    name: document.getElementById('name').value,
+                    age: document.getElementById('age').value,
+                    gender: document.getElementById('gender').value,
+                    medical_conditions: document.getElementById('medical_conditions').value,
+                    emergency_contact: document.getElementById('emergency_contact').value,
+                    hobbies: document.getElementById('hobbies').value,
+                    notes: document.getElementById('notes').value
+                };
+
+                const saveBtn = document.querySelector('#profileForm .save-button');
+                const saveMsg = document.getElementById('saveMessage');
+
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+                saveMsg.textContent = '';
+                saveMsg.className = 'save-message';
+
+                try {
+                    const response = await fetch('/api/profile', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (response.ok) {
+                        saveMsg.textContent = 'Profile saved successfully!';
+                        saveMsg.classList.add('success');
+                        setTimeout(() => {
+                            saveMsg.textContent = '';
+                            saveMsg.classList.remove('success');
+                        }, 3000);
+                    } else {
+                        throw new Error('Failed to save');
+                    }
+                } catch (error) {
+                    console.error('Error saving profile:', error);
+                    saveMsg.textContent = 'Error saving profile.';
+                    saveMsg.classList.add('error');
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i data-lucide="save"></i> Save Profile';
+                    lucide.createIcons();
+                }
+            }
+
+            // --- Routine Logic ---
+
+            async function loadRoutines() {
+                try {
+                    const response = await fetch('/api/routines');
+                    if (response.ok) {
+                        allRoutines = await response.json();
+                        // Ensure it's an array (handle legacy data if any)
+                        if (!Array.isArray(allRoutines)) allRoutines = [];
+                        renderRoutines();
+                    }
+                } catch (error) {
+                    console.error('Error loading routines:', error);
+                }
+            }
+
+            function filterRoutines(view) {
+                currentView = view;
+
+                // Update toggle buttons
+                document.getElementById('viewToday').classList.toggle('active', view === 'today');
+                document.getElementById('viewAll').classList.toggle('active', view === 'all');
+
+                renderRoutines();
+            }
+
+            function renderRoutines() {
+                const list = document.getElementById('routinesList');
+                list.innerHTML = '';
+
+                let routinesToShow = allRoutines;
+
+                if (currentView === 'today') {
+                    const today = new Date().toLocaleDateString('en-US', { weekday: 'short' }); // e.g., "Mon"
+                    routinesToShow = allRoutines.filter(r => r.days && r.days.includes(today));
+                }
+
+                // Sort by time
+                routinesToShow.sort((a, b) => a.time.localeCompare(b.time));
+
+                if (routinesToShow.length === 0) {
+                    list.innerHTML = `<div style="text-align:center; color:rgba(255,255,255,0.6); padding:40px;">No routines found for ${currentView === 'today' ? 'today' : 'this view'}.</div>`;
+                    return;
+                }
+
+                routinesToShow.forEach(routine => {
+                    const isCompleted = routine.lastCompleted === new Date().toISOString().split('T')[0];
+                    const isPaused = routine.paused === true;
+
+                    const card = document.createElement('div');
+                    card.className = `routine-card ${isCompleted ? 'completed' : ''} ${isPaused ? 'paused' : ''}`;
+
+                    let mediaHtml = '';
+                    if (routine.mediaPath) {
+                        const ext = routine.mediaPath.split('.').pop().toLowerCase();
+                        if (['mp4', 'mov', 'webm'].includes(ext)) {
+                            mediaHtml = `<div class="routine-media"><video src="${routine.mediaPath}" controls></video></div>`;
+                        } else {
+                            mediaHtml = `<div class="routine-media"><img src="${routine.mediaPath}" alt="Routine Media"></div>`;
+                        }
+                    }
+
+                    card.innerHTML = `
+                    <div class="routine-header">
+                        <div class="routine-info">
+                            <h3>${escapeHtml(routine.title)}</h3>
+                            <div class="routine-meta">
+                                <span><i data-lucide="clock" style="width:14px;"></i> ${formatTime(routine.time)}</span>
+                                <span><i data-lucide="calendar" style="width:14px;"></i> ${formatDays(routine.days)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    ${routine.description ? `<p style="color:rgba(255,255,255,0.8); font-size:0.9rem; margin-top:8px;">${escapeHtml(routine.description)}</p>` : ''}
+                    ${mediaHtml}
+                    <div class="routine-actions">
+                         <button class="text-btn btn-done" onclick="toggleComplete('${routine.id}')">
+                            ${isCompleted ? 'Completed' : 'Mark Done'}
+                        </button>
+                        <button class="text-btn btn-pause" onclick="togglePause('${routine.id}')">
+                            ${isPaused ? 'Resume' : 'Pause'}
+                        </button>
+                        <button class="text-btn btn-edit" onclick="openRoutineModal('${routine.id}')">
+                            Edit
+                        </button>
+                        <button class="text-btn btn-delete" onclick="deleteRoutine('${routine.id}')">
+                            Delete
+                        </button>
+                    </div>
+                `;
+                    list.appendChild(card);
+                });
+                lucide.createIcons();
+            }
+
+            // Toggle Day Selection
+            function toggleDay(btn) {
+                btn.classList.toggle('selected');
+            }
+
+            // Modal Functions
+            function openRoutineModal(id = null) {
+                const modal = document.getElementById('routineModal');
+                const title = document.getElementById('modalTitle');
+                const form = document.getElementById('routineForm');
+
+                // Reset form
+                form.reset();
+                document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('selected'));
+                document.getElementById('routineId').value = '';
+
+                if (id) {
+                    const routine = allRoutines.find(r => r.id === id);
+                    if (routine) {
+                        title.textContent = 'Edit Routine';
+                        document.getElementById('routineId').value = routine.id;
+                        document.getElementById('routineTitle').value = routine.title;
+                        document.getElementById('routineDesc').value = routine.description || '';
+                        document.getElementById('routineTime').value = routine.time;
+                        document.getElementById('routineReminder').value = routine.reminder || '0';
+
+                        routine.days.forEach(day => {
+                            const btn = document.querySelector(`.day-btn[data-day="${day}"]`);
+                            if (btn) btn.classList.add('selected');
+                        });
+                    }
+                } else {
+                    title.textContent = 'Add Routine';
+                    // Select all days by default for new routine? Or none. Let's do M-F as default convenience?
+                    // Or just leave empty.
+                }
+
+                modal.classList.add('active');
+                document.body.classList.add('modal-open');
+            }
+
+            function closeRoutineModal() {
+                document.getElementById('routineModal').classList.remove('active');
+                document.body.classList.remove('modal-open');
+            }
+
+            async function saveRoutine() {
+                const id = document.getElementById('routineId').value;
+                const title = document.getElementById('routineTitle').value.trim();
+                const desc = document.getElementById('routineDesc').value;
+                const time = document.getElementById('routineTime').value;
+                const reminder = document.getElementById('routineReminder').value;
+                const mediaInput = document.getElementById('routineMedia');
+
+                const selectedDays = Array.from(document.querySelectorAll('.day-btn.selected'))
+                    .map(btn => btn.getAttribute('data-day'));
+
+                // Validation
+                if (!title) {
+                    alert('Please enter a Routine Name.');
+                    return;
+                }
+                if (!time) {
+                    alert('Please select a Time.');
+                    return;
+                }
+                if (selectedDays.length === 0) {
+                    alert('Please select at least one Day of Week.');
+                    return;
+                }
+
+                // Handle file upload
+                let mediaPath = null;
+                if (id) {
+                    const existing = allRoutines.find(r => r.id === id);
+                    if (existing) mediaPath = existing.mediaPath;
+                }
+
+                if (mediaInput.files.length > 0) {
+                    const formData = new FormData();
+                    formData.append('file', mediaInput.files[0]);
+
+                    try {
+                        const uploadRes = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        if (uploadRes.ok) {
+                            const data = await uploadRes.json();
+                            mediaPath = data.url;
+                        }
+                    } catch (error) {
+                        console.error('Upload failed:', error);
+                        alert('Failed to upload media.');
+                        return;
+                    }
+                }
+
+                const newRoutine = {
+                    id: id || generateUUID(),
+                    title,
+                    description: desc,
+                    time,
+                    reminder,
+                    days: selectedDays,
+                    mediaPath: mediaPath,
+                    paused: id ? (allRoutines.find(r => r.id === id)?.paused || false) : false,
+                    lastCompleted: id ? (allRoutines.find(r => r.id === id)?.lastCompleted || null) : null
+                };
+
+                // Update local list
+                if (id) {
+                    const index = allRoutines.findIndex(r => r.id === id);
+                    if (index !== -1) allRoutines[index] = newRoutine;
+                } else {
+                    allRoutines.push(newRoutine);
+                }
+
+                await syncRoutines();
+                closeRoutineModal();
+                renderRoutines();
+            }
+
+            async function deleteRoutine(id) {
+                if (!confirm('Are you sure you want to delete this routine?')) return;
+                allRoutines = allRoutines.filter(r => r.id !== id);
+                await syncRoutines();
+                renderRoutines();
+            }
+
+            async function toggleComplete(id) {
+                const routine = allRoutines.find(r => r.id === id);
+                if (!routine) return;
+
+                const today = new Date().toISOString().split('T')[0];
+
+                if (routine.lastCompleted === today) {
+                    routine.lastCompleted = null; // Uncheck
+                } else {
+                    routine.lastCompleted = today; // Check
+                }
+
+                await syncRoutines();
+                renderRoutines();
+            }
+
+            async function togglePause(id) {
+                const routine = allRoutines.find(r => r.id === id);
+                if (!routine) return;
+
+                routine.paused = !routine.paused;
+                await syncRoutines();
+                renderRoutines();
+            }
+
+            async function syncRoutines() {
+                try {
+                    await fetch('/api/routines', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(allRoutines)
+                    });
+                } catch (error) {
+                    console.error('Error syncing routines:', error);
+                }
+            }
+
+            // --- Memory Logic ---
+
+            async function loadMemories() {
+                try {
+                    const response = await fetch('/api/memories');
+                    if (response.ok) {
+                        allMemories = await response.json();
+                        if (!Array.isArray(allMemories)) allMemories = [];
+                        renderMemories();
+                    }
+                } catch (error) {
+                    console.error('Error loading memories:', error);
+                }
+            }
+
+            function renderMemories() {
+                const list = document.getElementById('memoriesList');
+                list.innerHTML = '';
+
+                if (allMemories.length === 0) {
+                    list.innerHTML = `<div style="text-align:center; color:rgba(255,255,255,0.6); padding:40px; grid-column: 1/-1;">No memories added yet.</div>`;
+                    return;
+                }
+
+                // Sort by date (newest first)
+                allMemories.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                allMemories.forEach(memory => {
+                    const card = document.createElement('div');
+                    card.className = 'memory-card';
+
+                    let mediaHtml = '';
+                    if (memory.mediaPath) {
+                        const ext = memory.mediaPath.split('.').pop().toLowerCase();
+                        if (['mp4', 'mov', 'webm'].includes(ext)) {
+                            mediaHtml = `<div class="memory-media"><video src="${memory.mediaPath}" controls></video></div>`;
+                        } else {
+                            mediaHtml = `<div class="memory-media"><img src="${memory.mediaPath}" alt="Memory Media"></div>`;
+                        }
+                    } else {
+                        mediaHtml = `<div class="memory-media placeholder"><i data-lucide="image" style="width:32px; height:32px; color:rgba(0,0,0,0.2);"></i></div>`;
+                    }
+
+                    card.innerHTML = `
+                    ${mediaHtml}
+                    <div class="memory-content">
+                        <div class="memory-header">
+                            <h3>${escapeHtml(memory.title)}</h3>
+                            <span class="memory-date">${formatDate(memory.date)}</span>
+                        </div>
+                        <p class="memory-desc">${escapeHtml(memory.description || '')}</p>
+                        <div class="memory-actions">
+                            <button class="action-btn" onclick="openMemoryModal('${memory.id}')" title="Edit">
+                                <i data-lucide="edit-2" style="width:16px;"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteMemory('${memory.id}')" title="Delete">
+                                <i data-lucide="trash-2" style="width:16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                    list.appendChild(card);
+                });
+                lucide.createIcons();
+            }
+
+            function openMemoryModal(id = null) {
+                const modal = document.getElementById('memoryModal');
+                const title = document.getElementById('memoryModalTitle');
+                const form = document.getElementById('memoryForm');
+
+                form.reset();
+                document.getElementById('memoryId').value = '';
+
+                if (id) {
+                    const memory = allMemories.find(m => m.id === id);
+                    if (memory) {
+                        title.textContent = 'Edit Memory';
+                        document.getElementById('memoryId').value = memory.id;
+                        document.getElementById('memoryTitle').value = memory.title;
+                        document.getElementById('memoryDate').value = memory.date;
+                        document.getElementById('memoryDesc').value = memory.description || '';
+                    }
+                } else {
+                    title.textContent = 'Add Memory';
+                    document.getElementById('memoryDate').value = new Date().toISOString().split('T')[0];
+                }
+
+                modal.classList.add('active');
+                document.body.classList.add('modal-open');
+            }
+
+            function closeMemoryModal() {
+                document.getElementById('memoryModal').classList.remove('active');
+                document.body.classList.remove('modal-open');
+            }
+
+            async function saveMemory() {
+                const id = document.getElementById('memoryId').value;
+                const title = document.getElementById('memoryTitle').value.trim();
+                const date = document.getElementById('memoryDate').value;
+                const desc = document.getElementById('memoryDesc').value;
+                const mediaInput = document.getElementById('memoryMedia');
+
+                if (!title) {
+                    alert('Please enter a Title.');
+                    return;
+                }
+
+                // Handle file upload
+                let mediaPath = null;
+                if (id) {
+                    const existing = allMemories.find(m => m.id === id);
+                    if (existing) mediaPath = existing.mediaPath;
+                }
+
+                if (mediaInput.files.length > 0) {
+                    const formData = new FormData();
+                    formData.append('file', mediaInput.files[0]);
+
+                    try {
+                        const uploadRes = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        if (uploadRes.ok) {
+                            const data = await uploadRes.json();
+                            mediaPath = data.url;
+                        }
+                    } catch (error) {
+                        console.error('Upload failed:', error);
+                        alert('Failed to upload media.');
+                        return;
+                    }
+                }
+
+                const newMemory = {
+                    id: id || generateUUID(),
+                    title,
+                    date,
+                    description: desc,
+                    mediaPath: mediaPath
+                };
+
+                if (id) {
+                    const index = allMemories.findIndex(m => m.id === id);
+                    if (index !== -1) allMemories[index] = newMemory;
+                } else {
+                    allMemories.push(newMemory);
+                }
+
+                await syncMemories();
+                closeMemoryModal();
+                renderMemories();
+            }
+
+            async function deleteMemory(id) {
+                if (!confirm('Are you sure you want to delete this memory?')) return;
+                allMemories = allMemories.filter(m => m.id !== id);
+                await syncMemories();
+                renderMemories();
+            }
+
+            async function syncMemories() {
+                try {
+                    await fetch('/api/memories', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(allMemories)
+                    });
+                } catch (error) {
+                    console.error('Error syncing memories:', error);
+                }
+            }
+
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                // Ensure date is treated as local time to avoid timezone shifts
+                const date = new Date(dateString + 'T00:00:00');
+                return date.toLocaleDateString('en-US', options);
+            }
+
+            // Helpers
+            function generateUUID() { // Simple UUID generator
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+
+            function escapeHtml(text) {
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, function (m) { return map[m]; });
+            }
+
+            function formatTime(timeString) {
+                const [hours, minutes] = timeString.split(':');
+                const h = parseInt(hours);
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                const h12 = h % 12 || 12;
+                return `${h12}:${minutes} ${ampm}`;
+            }
+
+            function formatDays(days) {
+                if (days.length === 7) return 'Everyday';
+                if (days.length === 5 && !days.includes('Sat') && !days.includes('Sun')) return 'Weekdays';
+                if (days.length === 2 && days.includes('Sat') && days.includes('Sun')) return 'Weekends';
+                return days.join(', ');
+            }
+
+            // --- Family Logic ---
+
+
+
+            async function loadFamily() {
+                try {
+                    const response = await fetch('/api/family');
+                    if (response.ok) {
+                        allFamily = await response.json();
+                        if (!Array.isArray(allFamily)) allFamily = [];
+                        renderFamily();
+                    }
+                } catch (error) {
+                    console.error('Error loading family:', error);
+                }
+            }
+
+            function renderFamily() {
+                const list = document.getElementById('familyList');
+                list.innerHTML = '';
+
+                if (allFamily.length === 0) {
+                    list.innerHTML = `<div style="text-align:center; color:rgba(255,255,255,0.6); padding:40px; grid-column: 1/-1;">No family members added yet.</div>`;
+                    return;
+                }
+
+                allFamily.forEach(member => {
+                    const card = document.createElement('div');
+                    card.className = 'family-card centered';
+
+                    let mediaHtml = '';
+                    if (member.mediaPath) {
+                        mediaHtml = `<div class="family-avatar"><img src="${member.mediaPath}" alt="${member.name}"></div>`;
+                    } else {
+                        mediaHtml = `<div class="family-avatar placeholder"><i data-lucide="user" style="width:40px; height:40px; color:rgba(0,0,0,0.2);"></i></div>`;
+                    }
+
+                    card.innerHTML = `
+                        ${mediaHtml}
+                        <div class="family-content centered">
+                            <h3 class="family-name">${escapeHtml(member.name)}</h3>
+                            <span class="family-relation">${escapeHtml(member.relationship)}</span>
+                            
+                            <div class="family-actions-text">
+                                <button class="text-btn btn-edit" onclick="openFamilyModal('${member.id}')">Edit</button>
+                                <button class="text-btn btn-delete" onclick="deleteFamily('${member.id}')">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+                lucide.createIcons();
+            }
+
+            function openFamilyModal(id = null) {
+                const modal = document.getElementById('familyModal');
+                const title = document.getElementById('familyModalTitle');
+                const form = document.getElementById('familyForm');
+                const saveBtn = form.querySelector('.save-button');
+
+                form.reset();
+                document.getElementById('familyId').value = '';
+
+                if (id) {
+                    const member = allFamily.find(m => m.id === id);
+                    if (member) {
+                        title.textContent = 'Edit Family Member';
+                        saveBtn.textContent = 'Update Family Member';
+                        document.getElementById('familyId').value = member.id;
+                        document.getElementById('familyName').value = member.name;
+                        document.getElementById('familyRelation').value = member.relationship;
+                        document.getElementById('familyDate').value = member.importantDate || '';
+                        document.getElementById('familyContact').value = member.contact || '';
+                        document.getElementById('familyNotes').value = member.notes || '';
+                    }
+                } else {
+                    title.textContent = 'Add Family Member';
+                    saveBtn.textContent = 'Save Member';
+                }
+
+                modal.classList.add('active');
+                document.body.classList.add('modal-open');
+            }
+
+            function closeFamilyModal() {
+                document.getElementById('familyModal').classList.remove('active');
+                document.body.classList.remove('modal-open');
+            }
+
+            async function saveFamily() {
+                const id = document.getElementById('familyId').value;
+                const name = document.getElementById('familyName').value.trim();
+                const relationship = document.getElementById('familyRelation').value.trim();
+                const date = document.getElementById('familyDate').value;
+                const contact = document.getElementById('familyContact').value.trim();
+                const notes = document.getElementById('familyNotes').value.trim();
+                const mediaInput = document.getElementById('familyMedia');
+
+                if (!name || !relationship) {
+                    alert('Please enter Name and Relationship.');
+                    return;
+                }
+
+                // Handle file upload
+                let mediaPath = null;
+                if (id) {
+                    const existing = allFamily.find(m => m.id === id);
+                    if (existing) mediaPath = existing.mediaPath;
+                }
+
+                if (mediaInput.files.length > 0) {
+                    const formData = new FormData();
+                    formData.append('file', mediaInput.files[0]);
+
+                    try {
+                        const uploadRes = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        if (uploadRes.ok) {
+                            const data = await uploadRes.json();
+                            mediaPath = data.url;
+                        }
+                    } catch (error) {
+                        console.error('Upload failed:', error);
+                        alert('Failed to upload photo.');
+                        return;
+                    }
+                }
+
+                const newMember = {
+                    id: id || generateUUID(),
+                    name,
+                    relationship,
+                    importantDate: date,
+                    contact,
+                    notes,
+                    mediaPath: mediaPath
+                };
+
+                if (id) {
+                    const index = allFamily.findIndex(m => m.id === id);
+                    if (index !== -1) allFamily[index] = newMember;
+                } else {
+                    allFamily.push(newMember);
+                }
+
+                await syncFamily();
+                closeFamilyModal();
+                renderFamily();
+            }
+
+            async function deleteFamily(id) {
+                if (!confirm('Are you sure you want to delete this family member?')) return;
+                allFamily = allFamily.filter(m => m.id !== id);
+                await syncFamily();
+                renderFamily();
+            }
+
+            async function syncFamily() {
+                try {
+                    await fetch('/api/family', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(allFamily)
+                    });
+                } catch (error) {
+                    console.error('Error syncing family:', error);
+                }
+            }
+
+        </script>
+</body>
+
+</html>

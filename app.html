@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="A compassionate AI memory companion for elderly people, helping organize routines, preserve memories, and stay connected with family.">
+    <title>Aegis AI - Personal Memory Companion</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Persistent Header -->
+        <header class="global-header">
+            <h1 class="header-title">Aegis AI – Memory Companion</h1>
+            <p class="header-subtitle">Your space to organize routines, preserve memories, and stay connected.</p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-navigation">
+            <button class="tab-button active" data-tab="home">Home</button>
+            <button class="tab-button" data-tab="chat">Chat</button>
+            <button class="tab-button" data-tab="routines">Routines</button>
+            <button class="tab-button" data-tab="memories">Memories</button>
+            <button class="tab-button" data-tab="family">Family</button>
+            <button class="tab-button" data-tab="notes">Notes</button>
+            <button class="tab-button" data-tab="profile">Profile</button>
+        </nav>
+
+        <!-- Tab Contents -->
+        <main class="tab-container">
+            <!-- HOME TAB -->
+            <section id="home-tab" class="tab-content active">
+                <div class="home-grid">
+                    <!-- Today's Routines Card -->
+                    <div class="home-card">
+                        <div class="home-card-header">
+                            <h3>📅 Today's Routines</h3>
+                        </div>
+                        <div class="home-card-body" id="home-routines">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        <div class="home-card-footer">
+                            <button class="text-button" onclick="switchTab('routines')">Go to Routines</button>
+                        </div>
+                    </div>
+
+                    <!-- Recent Memories Card -->
+                    <div class="home-card">
+                        <div class="home-card-header">
+                            <h3>📸 Recent Memories</h3>
+                        </div>
+                        <div class="home-card-body" id="home-memories">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        <div class="home-card-footer">
+                            <button class="text-button" onclick="switchTab('memories')">View All Memories</button>
+                        </div>
+                    </div>
+
+                    <!-- Family Updates Card -->
+                    <div class="home-card">
+                        <div class="home-card-header">
+                            <h3>👨‍👩‍👧‍👦 Family Updates</h3>
+                        </div>
+                        <div class="home-card-body" id="home-family">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        <div class="home-card-footer">
+                            <button class="text-button" onclick="switchTab('family')">Go to Family</button>
+                        </div>
+                    </div>
+
+                    <!-- Chat with Aegis AI Card -->
+                    <div class="home-card chat-prompt-card" onclick="switchTab('chat')">
+                        <div class="home-card-header">
+                            <h3>💬 Chat with Aegis AI</h3>
+                        </div>
+                        <div class="home-card-body">
+                            <p class="chat-prompt-text" id="chat-prompt">Hello! I'd love to hear a story today. How are
+                                you feeling?</p>
+                        </div>
+                    </div>
+
+                    <!-- Quick Notes Card -->
+                    <div class="home-card quick-notes-card" id="quick-notes-home-card">
+                        <div class="home-card-header quick-notes-header">
+                            <h3>📝 Quick Notes</h3>
+                            <button class="qn-add-btn" onclick="openQuickNoteModal(event)" title="Add a note">＋</button>
+                        </div>
+                        <div class="home-card-body" id="home-notes-preview">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div class="home-card-footer">
+                            <button class="text-button" onclick="switchTab('notes')">View All Notes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-footer">
+                    <p>Navigate to:
+                        <a href="#" onclick="switchTab('routines'); return false;">Routines</a> •
+                        <a href="#" onclick="switchTab('memories'); return false;">Memories</a> •
+                        <a href="#" onclick="switchTab('family'); return false;">Family</a> •
+                        <a href="#" onclick="switchTab('chat'); return false;">Chat</a> •
+                        <a href="#" onclick="switchTab('profile'); return false;">Profile</a>
+                    </p>
+                </div>
+            </section>
+
+            <!-- NOTES TAB -->
+            <section id="notes-tab" class="tab-content">
+                <div class="tab-header">
+                    <h2 class="tab-title">📝 My Notes</h2>
+                    <button class="add-button" id="new-note-btn">+ New Note</button>
+                </div>
+                <div id="notes-grid" class="notes-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- ROUTINES TAB -->
+            <section id="routines-tab" class="tab-content">
+                <div class="tab-header">
+                    <div class="view-toggle">
+                        <button class="toggle-button active" data-view="today">Today</button>
+                        <button class="toggle-button" data-view="all">All Routines</button>
+                    </div>
+                    <button class="add-button" id="add-routine-btn">Add Routine</button>
+                </div>
+                <div class="content-grid" id="routines-list">
+                    <!-- Routines will be populated here -->
+                </div>
+            </section>
+
+            <!-- MEMORIES TAB -->
+            <section id="memories-tab" class="tab-content">
+                <div class="tab-header">
+                    <h2 class="tab-title">My Memories</h2>
+                    <div class="view-toggle" id="memory-filter-toggle">
+                        <button class="toggle-button active" data-filter="all">All Memories</button>
+                        <button class="toggle-button" data-filter="manual">Pure Memories</button>
+                        <button class="toggle-button" data-filter="chat">Chat-Derived Memories</button>
+                    </div>
+                    <button class="add-button" id="add-memory-btn">Add Memory</button>
+                </div>
+                <div class="content-grid" id="memories-list">
+                    <!-- Memories will be populated here -->
+                </div>
+            </section>
+
+            <!-- FAMILY TAB -->
+            <section id="family-tab" class="tab-content">
+                <div class="tab-header">
+                    <h2 class="tab-title">Family Members</h2>
+                    <button class="add-button" id="add-family-btn">Add Family Member</button>
+                </div>
+                <div class="content-grid" id="family-list">
+                    <!-- Family members will be populated here -->
+                </div>
+            </section>
+
+            <!-- CHAT TAB -->
+            <section id="chat-tab" class="tab-content">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="chat-header-main">
+                            <div class="chat-avatar">🤖</div>
+                            <div class="chat-info">
+                                <h2>Aegis Companion</h2>
+                                <p class="status">Always here for you</p>
+                            </div>
+                        </div>
+                        <div class="chat-actions">
+                            <button class="text-button delete" id="clear-chat-btn">Clear Chat</button>
+                        </div>
+                    </div>
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message ai-message">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p>Hello! I'm here to listen and chat with you. Feel free to share your stories,
+                                    memories, or anything on your mind. I'd love to hear about your day or reminisce
+                                    about your favorite moments!</p>
+                                <span class="message-time">Just now</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" id="chat-input" placeholder="Type a message or share a memory..."
+                            autocomplete="off">
+                        <button class="send-button" id="send-button">Send</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROFILE TAB -->
+            <section id="profile-tab" class="tab-content">
+                <div class="profile-container">
+                    <h2 class="tab-title">My Profile</h2>
+                    <form id="profile-form">
+
+                        <!-- SECTION 1: Basic Information -->
+                        <div class="form-section">
+                            <h3>Basic Information</h3>
+                            <div class="form-group">
+                                <label for="profile-name">Full Name</label>
+                                <input type="text" id="profile-name" placeholder="E.g. John Doe">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="profile-age">Age</label>
+                                    <input type="number" id="profile-age" placeholder="Age">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-gender">Gender</label>
+                                    <select id="profile-gender">
+                                        <option value="">Select Gender...</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                        <option value="prefer_not_to_say">Prefer not to say</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-address">Home Address</label>
+                                <input type="text" id="profile-address"
+                                    placeholder="E.g. 123 Maple Street, Springfield">
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2: Emergency Contacts (dynamic, multiple) -->
+                        <div class="form-section">
+                            <h3>Emergency Contacts</h3>
+                            <div id="emergency-contacts-list">
+                                <!-- Dynamic contact entries rendered by JS -->
+                            </div>
+                            <button type="button" class="add-item-button profile-add-btn"
+                                id="add-emergency-contact-btn">
+                                + Add Emergency Contact
+                            </button>
+                        </div>
+
+                        <!-- SECTION 3: Medical Information -->
+                        <div class="form-section">
+                            <h3>Medical Information</h3>
+                            <div class="form-group">
+                                <label for="profile-medical">Medical Conditions</label>
+                                <textarea id="profile-medical" rows="2"
+                                    placeholder="Any medical conditions, allergies, or medications..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Doctors / Medical Providers</label>
+                                <div id="doctors-list">
+                                    <!-- Dynamic doctor entries rendered by JS -->
+                                </div>
+                                <button type="button" class="add-item-button profile-add-btn" id="add-doctor-btn">
+                                    + Add Doctor
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 4: Personal Details -->
+                        <div class="form-section">
+                            <h3>Personal Details</h3>
+                            <div class="form-group">
+                                <label for="profile-hobbies">Hobbies &amp; Interests</label>
+                                <textarea id="profile-hobbies" rows="2"
+                                    placeholder="What do you enjoy doing? (e.g. Gardening, Chess)"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-notes">Additional Notes</label>
+                                <textarea id="profile-notes" rows="2"
+                                    placeholder="Anything else you'd like me to remember?"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 5: Preferences -->
+                        <div class="form-section">
+                            <h3>Preferences</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="profile-voice-speed">Voice Speed</label>
+                                    <select id="profile-voice-speed">
+                                        <option value="normal">Normal</option>
+                                        <option value="slow">Slow</option>
+                                        <option value="fast">Fast</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-font-size">Font Size</label>
+                                    <select id="profile-font-size">
+                                        <option value="normal">Normal</option>
+                                        <option value="big">Big</option>
+                                        <option value="small">Small</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-theme">Theme</label>
+                                <select id="profile-theme">
+                                    <option value="default">Normal (Default)</option>
+                                    <option value="ocean">Ocean Breeze</option>
+                                    <option value="forest">Forest Calm</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Bottom spacer so content isn't hidden behind the floating button -->
+                        <div style="height: 5rem;"></div>
+
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ROUTINE MODAL -->
+    <div id="routine-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="routine-modal-title">Add Routine</h2>
+                <button class="close-button" id="close-routine-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="routine-form">
+                    <input type="hidden" id="routine-id">
+
+                    <div class="form-group">
+                        <label for="routine-name">Routine Name *</label>
+                        <input type="text" id="routine-name" required placeholder="e.g. Take Medication">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routine-time">Time *</label>
+                        <input type="time" id="routine-time" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Days of Week *</label>
+                        <div class="day-selector">
+                            <button type="button" class="day-button" data-day="Mon">M</button>
+                            <button type="button" class="day-button" data-day="Tue">T</button>
+                            <button type="button" class="day-button" data-day="Wed">W</button>
+                            <button type="button" class="day-button" data-day="Thu">Th</button>
+                            <button type="button" class="day-button" data-day="Fri">F</button>
+                            <button type="button" class="day-button" data-day="Sat">Sa</button>
+                            <button type="button" class="day-button" data-day="Sun">Su</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routine-description">Description</label>
+                        <textarea id="routine-description" rows="2" placeholder="Details..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routine-reminder">Reminder</label>
+                        <select id="routine-reminder">
+                            <option value="0">None</option>
+                            <option value="5">5 minutes before</option>
+                            <option value="10">10 minutes before</option>
+                            <option value="15">15 minutes before</option>
+                            <option value="30">30 minutes before</option>
+                            <option value="60">1 hour before</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routine-media">Media (Image/Video)</label>
+                        <input type="file" id="routine-media" accept="image/*,video/*">
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-button" id="cancel-routine">Cancel</button>
+                        <button type="submit" class="save-button">Save Routine</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MEMORY MODAL -->
+    <div id="memory-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="memory-modal-title">Add Memory</h2>
+                <button class="close-button" id="close-memory-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="memory-form">
+                    <input type="hidden" id="memory-id">
+
+                    <div class="form-group">
+                        <label for="memory-title">Title *</label>
+                        <input type="text" id="memory-title" required placeholder="e.g. Summer Vacation 2024">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memory-date">Date</label>
+                        <input type="date" id="memory-date">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memory-description">Description</label>
+                        <textarea id="memory-description" rows="3" placeholder="What happened?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memory-media">Photo/Video</label>
+                        <input type="file" id="memory-media" accept="image/*,video/*">
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-button" id="cancel-memory">Cancel</button>
+                        <button type="submit" class="save-button">Save Memory</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAMILY MODAL -->
+    <div id="family-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="family-modal-title">Add Family Member</h2>
+                <button class="close-button" id="close-family-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="family-form">
+                    <input type="hidden" id="family-id">
+
+                    <div class="form-section">
+                        <h3>Basic Information</h3>
+                        <div class="form-group">
+                            <label for="family-name">Name *</label>
+                            <input type="text" id="family-name" required placeholder="E.g. Jane Doe">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="family-relation">Relation *</label>
+                            <input type="text" id="family-relation" required placeholder="E.g. Sister">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="family-photo">Photo URL</label>
+                            <input type="text" id="family-photo" placeholder="Photo URL (optional)">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="family-birthday">Birthday</label>
+                            <input type="date" id="family-birthday">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Contact Information</h3>
+                        <div class="form-group">
+                            <label for="family-phone">Phone Number</label>
+                            <input type="tel" id="family-phone" placeholder="Phone Number">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="family-address">Address</label>
+                            <input type="text" id="family-address" placeholder="Address">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Additional Information</h3>
+                        <div class="form-group">
+                            <label for="family-notes">Notes</label>
+                            <textarea id="family-notes" rows="2" placeholder="Likes, dislikes, stories..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Favorite Activities</label>
+                            <div id="family-activities-list"></div>
+                            <button type="button" class="add-item-button" id="add-activity">Add Activity</button>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Important Dates</label>
+                            <div id="family-dates-list"></div>
+                            <button type="button" class="add-item-button" id="add-date">Add Date</button>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-button" id="cancel-family">Cancel</button>
+                        <button type="submit" class="save-button">Save Family Member</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MEMORY CONFIRMATION MODAL -->
+    <div id="memory-confirm-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Memory Detected</h2>
+                <button class="close-button" onclick="closeMemoryConfirmModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>I noticed you just shared something meaningful. Would you like me to save this to your memories?</p>
+                <div id="memory-confirm-content"
+                    style="background: var(--color-gray-100); padding: var(--spacing-md); border-radius: var(--radius-md); margin: var(--spacing-md) 0;">
+                    <!-- Memory preview will be here -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-button" onclick="closeMemoryConfirmModal()">Dismiss</button>
+                <button class="save-button" id="confirm-save-memory-btn">Save to Memories</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTE EDITOR MODAL (used by Notes tab for Create + Edit) -->
+    <div id="note-editor-modal" class="modal-overlay">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h2 id="note-editor-title">✏️ New Note</h2>
+                <button class="close-button" onclick="closeNoteEditor()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="note-editor-id">
+                <div class="form-group">
+                    <label for="note-editor-name">Title *</label>
+                    <input type="text" id="note-editor-name" placeholder="Give your note a title…" maxlength="100"
+                        required>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label for="note-editor-body">Content <span
+                            style="color:var(--color-gray-400);font-size:0.8rem;">(optional)</span></label>
+                    <textarea id="note-editor-body" rows="9"
+                        placeholder="Write anything here – a reminder, thought, or moment to remember…"></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-button" onclick="closeNoteEditor()">Cancel</button>
+                <button class="save-button" id="note-editor-save-btn" onclick="saveNoteFromEditor()">Save Note</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK NOTE MODAL -->
+    <div id="quick-note-modal" class="modal-overlay">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h2>✏️ New Note</h2>
+                <button class="close-button" onclick="closeQuickNoteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="quick-note-form" onsubmit="saveQuickNote(event)">
+                    <div class="form-group">
+                        <label for="qn-title">Title <span
+                                style="color:var(--color-gray-400);font-size:0.8rem;">(optional)</span></label>
+                        <input type="text" id="qn-title" placeholder="E.g. Doctor appointment reminder" maxlength="80">
+                    </div>
+                    <div class="form-group">
+                        <label for="qn-content">Note *</label>
+                        <textarea id="qn-content" rows="5" placeholder="Want to remember something? Write it here…"
+                            required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-button" onclick="closeQuickNoteModal()">Cancel</button>
+                <button class="save-button" onclick="saveQuickNote()">Save Note</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- THEME ANIMATION OVERLAY (canvas, pointer-events:none) -->
+    <canvas id="theme-anim-canvas" class="theme-anim-canvas"></canvas>
+
+    <!-- FLOATING SAVE PROFILE BUTTON -->
+    <button id="floating-save-profile-btn" class="floating-save-btn"
+        onclick="document.getElementById('profile-form').requestSubmit()" title="Save Profile">
+        <span class="fsb-icon">💾</span>
+        <span class="fsb-label">Save Profile</span>
+    </button>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <!-- DELETE ENTRY CONFIRMATION MODAL -->
+    <div id="delete-entry-modal" class="modal-overlay">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h2>Confirm Deletion</h2>
+                <button class="close-button" onclick="cancelDeleteEntry()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="delete-entry-message">Are you sure you want to remove this entry? This cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-button" onclick="cancelDeleteEntry()">Cancel</button>
+                <button class="save-button" id="confirm-delete-entry-btn"
+                    style="background: var(--color-red);">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

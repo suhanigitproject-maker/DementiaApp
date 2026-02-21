@@ -1,0 +1,47 @@
+[
+  {
+    "days": [
+      "Mon",
+      "Wed",
+      "Fri"
+    ],
+    "description": "30 minute walk",
+    "id": "c96117e6-e594-45d9-ba53-1fd78ffd9e8f",
+    "lastCompleted": "2026-02-16",
+    "mediaPath": null,
+    "paused": false,
+    "reminder": "0",
+    "time": "07:00",
+    "title": "Morning Walk"
+  },
+  {
+    "days": [
+      "Mon",
+      "Sun"
+    ],
+    "description": "white pills on the kitchen counter",
+    "id": "cd2aa338-f5bf-4acb-b19e-4f42a7e15e31",
+    "lastCompleted": null,
+    "mediaPath": "/uploads/baeccbfb-aaa2-4966-b165-110758c79680_DNA EXTRACTION.png",
+    "paused": false,
+    "reminder": "0",
+    "time": "11:30",
+    "title": "Take Medication"
+  },
+  {
+    "id": "e49b95ef-1ce4-4eb7-b756-0ba262d012bf",
+    "title": "Take Medication",
+    "description": "",
+    "time": "10:50",
+    "reminder": "0",
+    "days": [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu"
+    ],
+    "mediaPath": null,
+    "paused": false,
+    "lastCompleted": "2026-02-18"
+  }
+]
