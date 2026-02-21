@@ -1,8 +1,36 @@
 [
   {
+    "activities": [],
+    "address": "",
+    "birthday": "",
     "id": "a6f2058b-c66a-461a-a724-b928662ba84a",
+    "importantDates": [],
     "name": "Jane Doe",
-    "relation": "Wife",
+    "notes": "",
+    "phone": "",
+    "photo": "",
+    "relation": "Wife"
+  },
+  {
+    "id": "e90a3a20-5dc9-4bbe-820c-f81d785494de",
+    "name": "John Green",
+    "relation": "Son",
+    "photo": "/images/john.png",
+    "birthday": "1990-02-03",
+    "phone": "555\u2011123\u20114567",
+    "address": "124 Maple Street, Springfield",
+    "notes": "Visits every Sunday",
+    "activities": [
+      "Gardening, Reading"
+    ],
+    "importantDates": [
+      "2026-12-05"
+    ]
+  },
+  {
+    "id": "850e2b1d-4d0d-4b6c-a8d7-c7b747967719",
+    "name": "Mary Lopez",
+    "relation": "Neighbour",
     "photo": "",
     "birthday": "",
     "phone": "",

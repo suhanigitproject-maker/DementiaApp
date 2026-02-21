@@ -1,23 +1,58 @@
 {
-  "name": "John Doe",
-  "age": "75",
-  "gender": "male",
-  "address": "",
-  "medical_conditions": "Diabetes, Early-stage Dementia",
-  "hobbies": "Gardening",
+  "preferred_name": "Eleanor",
+  "pronouns": "she/her",
+  "languages": "English, French",
+  "cultural_bg": "",
+  "memory_level": "mild",
+  "comfort_topics": "Gardening, Baking, Classical Music",
+  "avoid_topics": "News about accidents, Politics",
+  "triggers": "Loud noises in the evening",
+  "day_type": "morning",
+  "reminder_style": "gentle",
+  "name": "Eleanor Green",
+  "age": "78",
+  "gender": "female",
+  "address": "124 Maple Street, Springfield, IL, USA",
+  "medical_conditions": "Eleanor has mild memory loss and takes vitamin supplements daily.",
+  "hobbies": "Gardening, Baking, Classical Music",
   "notes": "I like early mornings",
+  "important_people": "John Green (Son), Mary Lopez (Neighbor)",
+  "music_era": "1960s and 1970s Classical Pop",
+  "favourite_place": "Lakeside Park",
   "emergency_contacts": [
     {
-      "name": "Jane Doe",
-      "relation": "Wife",
+      "name": "John Green",
+      "relation": "Son",
       "phone": "555-0199",
+      "address": ""
+    },
+    {
+      "name": "Mary Lopez",
+      "relation": "Neighbour",
+      "phone": "555\u2011987\u20116543",
       "address": ""
     }
   ],
-  "doctors": [],
+  "doctors": [
+    {
+      "name": "Dr. Susan Harper",
+      "specialty": "Neurology",
+      "phone": "(555) 222\u20113344"
+    },
+    {
+      "name": "Dr. Alan Kim",
+      "specialty": "General Physician",
+      "phone": "(555) 222\u20115566"
+    }
+  ],
+  "accessibility": {
+    "high_contrast": false,
+    "reduced_motion": true,
+    "tts": true
+  },
   "preferences": {
     "voice_speed": "normal",
     "font_size": "normal",
-    "theme": "ocean"
+    "theme": "forest"
   }
 }
