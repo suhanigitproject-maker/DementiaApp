@@ -1,21 +1,28 @@
 {
   "memories": [
     {
-      "id": "0a327310-2847-4f12-8715-e6567f4d00a2",
-      "title": "Summer vacay",
-      "date": "2026-02-15",
-      "description": "We stayed at a hotel",
-      "mediaPath": "/uploads/8f107c69-3b85-492c-8f7d-d40cb725a02a_DNA EXTRACTION.png",
+      "id": "499df9db-4736-4ad4-bff9-bd3ee98cbc40",
+      "title": "Family Picnic 2023",
+      "date": "",
+      "description": "Picnic with John and Mary at Lakeside Park. The sun was shining, made sandwiches.",
+      "mediaPath": null,
       "source": "manual"
     },
     {
-      "id": "d18c4ee3-18d5-47c5-8df5-9fd76127ca3f",
-      "title": "Sunday walks with daughter",
-      "date": "2026-02-20",
-      "description": "Spending time with daughter on walks to the park on Sundays.",
+      "id": "59f08e43-5226-4f13-8d18-5ab1fe75c09b",
+      "title": "Baking Chocolate Cake",
+      "date": "2026-01-21",
+      "description": "Tried new recipe from old cookbook, turned out perfect!",
       "mediaPath": null,
-      "source": "chat",
-      "chatRef": "a782538e-ee95-498c-a9ac-c95766f48f30"
+      "source": "manual"
+    },
+    {
+      "id": "cc420147-5358-4a75-aec7-bb5d8b5aad1d",
+      "title": "Garden Tulips 2022",
+      "date": "",
+      "description": "Planted tulips in spring, loved the colours.",
+      "mediaPath": null,
+      "source": "manual"
     }
   ],
   "interests": [
@@ -47,5 +54,5 @@
   ],
   "medications": [],
   "adaptive_categories": {},
-  "last_updated": "2026-02-20T14:43:08.502505"
+  "last_updated": "2026-02-21T10:28:37.088247"
 }

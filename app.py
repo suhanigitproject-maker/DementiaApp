@@ -16,8 +16,11 @@ CORS(app, resources={
     }
 })
 
-# Configure Gemini API
-GEMINI_API_KEY = "AIzaSyBA34FzAhxFeoKNgvzkPXO5ZiPS6HMugEw"
+from dotenv import load_dotenv
+load_dotenv()  # reads .env into os.environ
+
+# Configure Gemini API — key lives in .env, never in source code
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
 
 # File to store memories
