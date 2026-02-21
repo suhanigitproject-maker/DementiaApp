@@ -506,6 +506,24 @@ body {
     border-color: var(--color-gray-400);
 }
 
+.delete-confirm-button {
+    padding: 0.55rem var(--spacing-xl);
+    background-color: var(--color-red);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.delete-confirm-button:hover {
+    opacity: 0.88;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+}
+
 /* ── inline action buttons on cards ── */
 .text-button {
     padding: 0.35rem 0.85rem;

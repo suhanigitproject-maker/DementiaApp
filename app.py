@@ -10,14 +10,14 @@ app = Flask(__name__)
 # Enable CORS with proper configuration for preflight requests
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:5000", "http://127.0.0.1:5000"],
+        "origins": "*",
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type"]
     }
 })
 
 # Configure Gemini API
-GEMINI_API_KEY = "AIzaSyAuFqv9xfeVzqCVa8jTxP-dxWfge_v-CUk"
+GEMINI_API_KEY = "AIzaSyBA34FzAhxFeoKNgvzkPXO5ZiPS6HMugEw"
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
 
 # File to store memories

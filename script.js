@@ -766,11 +766,15 @@ async function saveRoutine() {
     renderRoutines();
 }
 
-async function deleteRoutine(id) {
-    if (!confirm('Are you sure you want to delete this routine?')) return;
-    routines = routines.filter(r => r.id !== id);
-    await syncRoutines();
-    renderRoutines();
+function deleteRoutine(id) {
+    const routine = routines.find(r => r.id === id);
+    const label = routine ? `"${routine.title || 'this routine'}"` : 'this routine';
+    openDeleteEntryModal(label, async () => {
+        routines = routines.filter(r => r.id !== id);
+        await syncRoutines();
+        renderRoutines();
+        showToast('Deleted successfully.', 'info');
+    });
 }
 
 function editRoutine(id) {
@@ -1018,11 +1022,15 @@ async function saveMemory() {
     renderMemories();
 }
 
-async function deleteMemory(id) {
-    if (!confirm('Are you sure you want to delete this memory?')) return;
-    memories = memories.filter(m => m.id !== id);
-    await syncMemories();
-    renderMemories();
+function deleteMemory(id) {
+    const memory = memories.find(m => m.id === id);
+    const label = memory ? `"${memory.title || 'this memory'}"` : 'this memory';
+    openDeleteEntryModal(label, async () => {
+        memories = memories.filter(m => m.id !== id);
+        await syncMemories();
+        renderMemories();
+        showToast('Deleted successfully.', 'info');
+    });
 }
 
 function editMemory(id) {
@@ -1242,11 +1250,15 @@ async function saveFamily() {
     renderFamily();
 }
 
-async function deleteFamily(id) {
-    if (!confirm('Are you sure you want to delete this family member?')) return;
-    family = family.filter(f => f.id !== id);
-    await syncFamily();
-    renderFamily();
+function deleteFamily(id) {
+    const member = family.find(f => f.id === id);
+    const label = member ? `"${member.name || 'this family member'}"` : 'this family member';
+    openDeleteEntryModal(label, async () => {
+        family = family.filter(f => f.id !== id);
+        await syncFamily();
+        renderFamily();
+        showToast('Deleted successfully.', 'info');
+    });
 }
 
 function editFamily(id) {

@@ -136,5 +136,65 @@
         "timestamp": "2026-02-20T14:42:59.470148",
         "sender": "Aegis AI",
         "content": "It sounds like those times with your daughter are very special to you. You've mentioned those Sunday walks to the park a couple of times now. It clearly means a lot to you. Would you like me to save that as a memory so we can look back on it together?"
+    },
+    {
+        "id": "261a4361-cfec-4281-8175-156f57f115bb",
+        "timestamp": "2026-02-20T21:14:52.912269",
+        "sender": "User",
+        "content": "hi"
+    },
+    {
+        "id": "95a74edb-af9c-4d11-a9c9-72fbbbaad473",
+        "timestamp": "2026-02-20T21:14:52.912282",
+        "sender": "Aegis AI",
+        "content": "Hello there, John. It's lovely to hear from you. How are you feeling this evening?"
+    },
+    {
+        "id": "4bf8a158-4dcc-46d1-9bd9-f4634bf876d1",
+        "timestamp": "2026-02-20T21:14:59.816584",
+        "sender": "User",
+        "content": "WHo am I??"
+    },
+    {
+        "id": "b5892615-a239-439a-ab32-0f4055f103a7",
+        "timestamp": "2026-02-20T21:14:59.816593",
+        "sender": "Aegis AI",
+        "content": "You are John Doe. You are 75 years old, and you have a wonderful interest in gardening. You also have a loving wife named Jane."
+    },
+    {
+        "id": "7c0fdef7-c043-485f-8518-272e527e8f2d",
+        "timestamp": "2026-02-20T21:15:07.025869",
+        "sender": "User",
+        "content": "nice"
+    },
+    {
+        "id": "c8269234-71b8-48d5-b5f1-67a27dedcc38",
+        "timestamp": "2026-02-20T21:15:07.025878",
+        "sender": "Aegis AI",
+        "content": "It's good to know that. Is there anything you'd like to chat about today, John?"
+    },
+    {
+        "id": "c60b99a1-179c-448a-9406-6477c971c761",
+        "timestamp": "2026-02-20T21:15:18.102833",
+        "sender": "User",
+        "content": "hmm nothing much"
+    },
+    {
+        "id": "4082aeb9-1d6e-433f-863a-f6084925ddad",
+        "timestamp": "2026-02-20T21:15:18.102845",
+        "sender": "Aegis AI",
+        "content": "That's perfectly alright, John. Sometimes it's nice to just be. If anything comes to mind, I'm here to listen."
+    },
+    {
+        "id": "0de51ac8-c5b9-430c-a376-dd9ff5f47380",
+        "timestamp": "2026-02-20T21:44:01.975681",
+        "sender": "User",
+        "content": "hi"
+    },
+    {
+        "id": "563207b5-efb7-4b37-9292-2b8ffa646aa9",
+        "timestamp": "2026-02-20T21:44:01.975696",
+        "sender": "Aegis AI",
+        "content": "Hello again, John. It's good to hear from you. How are you doing this evening?"
     }
 ]
