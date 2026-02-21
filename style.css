@@ -70,19 +70,23 @@
     --color-red-hover: #DC2626;
 
     /* ── Unified card design tokens ── */
-    --card-bg:        var(--color-white);
-    --card-border:    1px solid var(--color-gray-200);
-    --card-radius:    var(--radius-xl);         /* 1rem — same on every card */
-    --card-shadow:    var(--shadow-md);
-    --card-padding:   var(--spacing-lg);        /* 1.5rem inside every card */
-    --card-gap:       var(--spacing-lg);        /* gap between cards */
-    --section-gap:    var(--spacing-xl);        /* gap between sections */
+    --card-bg: var(--color-white);
+    --card-border: 1px solid var(--color-gray-200);
+    --card-radius: var(--radius-xl);
+    /* 1rem — same on every card */
+    --card-shadow: var(--shadow-md);
+    --card-padding: var(--spacing-lg);
+    /* 1.5rem inside every card */
+    --card-gap: var(--spacing-lg);
+    /* gap between cards */
+    --section-gap: var(--spacing-xl);
+    /* gap between sections */
 
     /* ── Colour aliases used in buttons ── */
-    --btn-primary-bg:       var(--color-teal);
-    --btn-primary-hover:    var(--color-teal-hover);
-    --btn-delete-bg:        var(--color-red);
-    --btn-delete-hover:     var(--color-red-hover);
+    --btn-primary-bg: var(--color-teal);
+    --btn-primary-hover: var(--color-teal-hover);
+    --btn-delete-bg: var(--color-red);
+    --btn-delete-hover: var(--color-red-hover);
 
     /* ── Layout ── */
     --content-max-width: 1100px;
@@ -263,27 +267,33 @@ body {
 .global-header {
     background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-sky) 100%);
     color: var(--color-white);
-    padding: var(--spacing-2xl) var(--spacing-xl);
+    padding: 3rem var(--spacing-xl);
+    min-height: 235px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
+    gap: 0.75rem;
     box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .header-title {
-    font-size: 2.25rem;
+    font-size: 3rem;
     font-weight: 700;
-    margin-bottom: var(--spacing-xs);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin: 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .header-subtitle {
-    font-size: 1.125rem;
-    opacity: 0.9;
+    font-size: 1rem;
+    opacity: 0.88;
     font-weight: 400;
-    max-width: 600px;
+    max-width: 580px;
+    line-height: 1.5;
+    margin: 0;
 }
 
 /* ===================================
@@ -630,7 +640,8 @@ body {
     color: var(--color-gray-600);
     font-size: 0.875rem;
     line-height: 1.6;
-    flex: 1;                 /* pushes actions to the bottom */
+    flex: 1;
+    /* pushes actions to the bottom */
     margin-bottom: var(--spacing-md);
 }
 
@@ -1369,29 +1380,34 @@ body.theme-forest {
    =================================== */
 .global-header {
     text-align: center;
-    padding: var(--spacing-2xl) var(--spacing-xl);
+    padding: 3rem var(--spacing-xl);
+    min-height: 235px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 0.75rem;
     background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-sky) 100%);
     color: var(--color-white);
     box-shadow: 0 2px 12px rgba(20, 184, 166, 0.18);
 }
 
 .header-title {
-    font-size: 2rem;
+    font-size: 3rem;
     font-weight: 700;
-    margin-bottom: var(--spacing-xs);
-    letter-spacing: -0.02em;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin: 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .header-subtitle {
     font-size: 1rem;
-    opacity: 0.92;
+    opacity: 0.88;
     font-weight: 400;
-    max-width: 560px;
+    max-width: 580px;
+    line-height: 1.5;
+    margin: 0;
 }
 
 /* ===================================
