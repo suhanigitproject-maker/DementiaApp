@@ -1624,9 +1624,9 @@ function openDeleteEntryModal(entryLabel, onConfirm) {
 
     const btn = document.getElementById('confirm-delete-entry-btn');
     btn.onclick = () => {
+        const cb = deleteEntryPendingCallback; // capture BEFORE cancelDeleteEntry nulls it
         cancelDeleteEntry();
-        if (deleteEntryPendingCallback) deleteEntryPendingCallback();
-        deleteEntryPendingCallback = null;
+        if (cb) cb();
     };
 }
 
