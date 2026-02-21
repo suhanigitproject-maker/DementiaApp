@@ -1738,6 +1738,22 @@ async function loadProfile() {
         if (response.ok) {
             const profile = await response.json();
 
+            // Identity & Context
+            document.getElementById('profile-preferred-name').value = profile.preferred_name || '';
+            document.getElementById('profile-pronouns').value = profile.pronouns || '';
+            document.getElementById('profile-languages').value = profile.languages || '';
+            document.getElementById('profile-cultural-bg').value = profile.cultural_bg || '';
+
+            // Cognitive & Support Context
+            document.getElementById('profile-memory-level').value = profile.memory_level || '';
+            document.getElementById('profile-comfort-topics').value = profile.comfort_topics || '';
+            document.getElementById('profile-avoid-topics').value = profile.avoid_topics || '';
+            document.getElementById('profile-triggers').value = profile.triggers || '';
+
+            // Daily Rhythm
+            document.getElementById('profile-day-type').value = profile.day_type || '';
+            document.getElementById('profile-reminder-style').value = profile.reminder_style || 'gentle';
+
             // Basic fields
             document.getElementById('profile-name').value = profile.name || '';
             document.getElementById('profile-age').value = profile.age || '';
@@ -1751,17 +1767,29 @@ async function loadProfile() {
             document.getElementById('profile-hobbies').value = profile.hobbies || '';
             document.getElementById('profile-notes').value = profile.notes || '';
 
+            // Emotional Anchors
+            document.getElementById('profile-important-people').value = profile.important_people || '';
+            document.getElementById('profile-music-era').value = profile.music_era || '';
+            document.getElementById('profile-favourite-place').value = profile.favourite_place || '';
+
+            // Accessibility toggles
+            document.getElementById('profile-high-contrast').checked = !!profile.accessibility?.high_contrast;
+            document.getElementById('profile-reduced-motion').checked = !!profile.accessibility?.reduced_motion;
+            document.getElementById('profile-tts').checked = !!profile.accessibility?.tts;
+
+            // Apply accessibility settings live
+            applyAccessibility(profile.accessibility || {});
+
             // Preferences
             document.getElementById('profile-voice-speed').value = profile.preferences?.voice_speed || 'normal';
             document.getElementById('profile-font-size').value = profile.preferences?.font_size || 'normal';
             document.getElementById('profile-theme').value = profile.preferences?.theme || 'default';
             applyTheme(profile.preferences?.theme || 'default');
 
-            // Dynamic lists: load from new schema (arrays) or migrate old single string
+            // Dynamic lists
             if (Array.isArray(profile.emergency_contacts)) {
                 emergencyContacts = profile.emergency_contacts;
             } else if (profile.emergency_contact) {
-                // Migrate legacy single-string field
                 emergencyContacts = [{ name: profile.emergency_contact, relation: '', phone: '', address: '' }];
             } else {
                 emergencyContacts = [];
@@ -1793,6 +1821,11 @@ function initProfile() {
         playThemeAnimation(e.target.value);
     });
 
+    // Accessibility toggles — apply live
+    document.getElementById('profile-high-contrast').addEventListener('change', () => applyAccessibilityFromForm());
+    document.getElementById('profile-reduced-motion').addEventListener('change', () => applyAccessibilityFromForm());
+    document.getElementById('profile-tts').addEventListener('change', () => applyAccessibilityFromForm());
+
     // Floating save button: become translucent while scrolling
     const floatingBtn = document.getElementById('floating-save-profile-btn');
     if (floatingBtn) {
@@ -1807,8 +1840,37 @@ function initProfile() {
     }
 }
 
+function applyAccessibility(acc) {
+    document.body.classList.toggle('high-contrast', !!acc.high_contrast);
+    document.body.classList.toggle('reduced-motion', !!acc.reduced_motion);
+}
+
+function applyAccessibilityFromForm() {
+    applyAccessibility({
+        high_contrast: document.getElementById('profile-high-contrast').checked,
+        reduced_motion: document.getElementById('profile-reduced-motion').checked,
+    });
+}
+
 async function saveProfile() {
     const profileData = {
+        // Identity & Context
+        preferred_name: document.getElementById('profile-preferred-name').value.trim(),
+        pronouns: document.getElementById('profile-pronouns').value,
+        languages: document.getElementById('profile-languages').value.trim(),
+        cultural_bg: document.getElementById('profile-cultural-bg').value.trim(),
+
+        // Cognitive & Support Context
+        memory_level: document.getElementById('profile-memory-level').value,
+        comfort_topics: document.getElementById('profile-comfort-topics').value.trim(),
+        avoid_topics: document.getElementById('profile-avoid-topics').value.trim(),
+        triggers: document.getElementById('profile-triggers').value.trim(),
+
+        // Daily Rhythm
+        day_type: document.getElementById('profile-day-type').value,
+        reminder_style: document.getElementById('profile-reminder-style').value,
+
+        // Basic
         name: document.getElementById('profile-name').value.trim(),
         age: document.getElementById('profile-age').value,
         gender: document.getElementById('profile-gender').value,
@@ -1816,8 +1878,24 @@ async function saveProfile() {
         medical_conditions: document.getElementById('profile-medical').value.trim(),
         hobbies: document.getElementById('profile-hobbies').value.trim(),
         notes: document.getElementById('profile-notes').value.trim(),
+
+        // Emotional Anchors
+        important_people: document.getElementById('profile-important-people').value.trim(),
+        music_era: document.getElementById('profile-music-era').value.trim(),
+        favourite_place: document.getElementById('profile-favourite-place').value.trim(),
+
+        // Dynamic lists
         emergency_contacts: readEmergencyContactsFromDOM(),
         doctors: readDoctorsFromDOM(),
+
+        // Accessibility
+        accessibility: {
+            high_contrast: document.getElementById('profile-high-contrast').checked,
+            reduced_motion: document.getElementById('profile-reduced-motion').checked,
+            tts: document.getElementById('profile-tts').checked,
+        },
+
+        // Display preferences
         preferences: {
             voice_speed: document.getElementById('profile-voice-speed').value,
             font_size: document.getElementById('profile-font-size').value,
@@ -1838,6 +1916,7 @@ async function saveProfile() {
 
         if (response.ok) {
             applyTheme(profileData.preferences.theme);
+            applyAccessibility(profileData.accessibility);
             showToast('Profile saved successfully!', 'success');
         } else {
             throw new Error('Failed to save');

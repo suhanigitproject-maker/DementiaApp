@@ -220,9 +220,115 @@
                         <h2 class="tab-title" style="margin-bottom: var(--spacing-xl);">My Profile</h2>
                         <form id="profile-form">
 
-                            <!-- SECTION 1: Basic Information -->
+                            <!-- SECTION 1: Identity & Context -->
                             <div class="form-section">
-                                <h3>Basic Information</h3>
+                                <div class="form-section-header">
+                                    <h3>Identity &amp; Context</h3>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-preferred-name">Preferred Name <span
+                                            class="required-star">*</span></label>
+                                    <input type="text" id="profile-preferred-name"
+                                        placeholder="What would you like to be called?" required>
+                                    <span class="field-hint">Used in chat responses and reminders</span>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="profile-pronouns">Pronouns <span
+                                                class="optional-tag">optional</span></label>
+                                        <select id="profile-pronouns">
+                                            <option value="">Select…</option>
+                                            <option value="he/him">He / Him</option>
+                                            <option value="she/her">She / Her</option>
+                                            <option value="they/them">They / Them</option>
+                                            <option value="other">Other</option>
+                                            <option value="prefer_not">Prefer not to say</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profile-languages">Languages Spoken <span
+                                                class="optional-tag">optional</span></label>
+                                        <input type="text" id="profile-languages" placeholder="e.g. English, Spanish">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-cultural-bg">Cultural Background <span
+                                            class="optional-tag">optional</span></label>
+                                    <input type="text" id="profile-cultural-bg"
+                                        placeholder="e.g. traditions, holidays, heritage">
+                                </div>
+                            </div>
+
+                            <!-- SECTION 2: Cognitive & Support Context -->
+                            <div class="form-section">
+                                <div class="form-section-header">
+                                    <h3>Cognitive &amp; Support Context</h3>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-memory-level">Memory Support Level <span
+                                            class="required-star">*</span></label>
+                                    <select id="profile-memory-level" required>
+                                        <option value="">Select level…</option>
+                                        <option value="mild">Mild – occasional reminders helpful</option>
+                                        <option value="moderate">Moderate – regular gentle prompting</option>
+                                        <option value="advanced">Advanced – consistent structured support</option>
+                                    </select>
+                                    <span class="field-hint">Helps Aegis adjust conversation pacing and support
+                                        style</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-comfort-topics">Comfort Topics <span
+                                            class="optional-tag">optional</span></label>
+                                    <textarea id="profile-comfort-topics" rows="2"
+                                        placeholder="Topics that bring calm or joy (e.g. gardening, music, grandchildren)"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-avoid-topics">Topics to Avoid <span
+                                            class="optional-tag">optional</span></label>
+                                    <textarea id="profile-avoid-topics" rows="2"
+                                        placeholder="Topics that may cause distress (e.g. news, specific events)"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-triggers">Common Triggers <span
+                                            class="optional-tag">optional</span></label>
+                                    <textarea id="profile-triggers" rows="2"
+                                        placeholder="Notes about situations that may cause anxiety or agitation"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- SECTION 3: Daily Rhythm & Preferences -->
+                            <div class="form-section">
+                                <div class="form-section-header">
+                                    <h3>Daily Rhythm &amp; Preferences</h3>
+                                    <span class="section-optional-badge">optional</span>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="profile-day-type">Time of Day Preference</label>
+                                        <select id="profile-day-type">
+                                            <option value="">No preference</option>
+                                            <option value="morning">🌅 Morning Person</option>
+                                            <option value="evening">🌙 Evening Person</option>
+                                            <option value="afternoon">☀️ Afternoon Person</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profile-reminder-style">Preferred Reminder Style</label>
+                                        <select id="profile-reminder-style">
+                                            <option value="gentle">🌸 Gentle</option>
+                                            <option value="direct">📋 Direct</option>
+                                            <option value="encouraging">✨ Encouraging</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION 4: Basic Information -->
+                            <div class="form-section">
+                                <div class="form-section-header">
+                                    <h3>Basic Information</h3>
+                                    <span class="section-optional-badge">optional</span>
+                                </div>
                                 <div class="form-group">
                                     <label for="profile-name">Full Name</label>
                                     <input type="text" id="profile-name" placeholder="E.g. John Doe">
@@ -230,12 +336,12 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="profile-age">Age</label>
-                                        <input type="number" id="profile-age" placeholder="Age">
+                                        <input type="number" id="profile-age" placeholder="Age" min="1" max="120">
                                     </div>
                                     <div class="form-group">
                                         <label for="profile-gender">Gender</label>
                                         <select id="profile-gender">
-                                            <option value="">Select Gender...</option>
+                                            <option value="">Select…</option>
                                             <option value="male">Male</option>
                                             <option value="female">Female</option>
                                             <option value="other">Other</option>
@@ -250,9 +356,11 @@
                                 </div>
                             </div>
 
-                            <!-- SECTION 2: Emergency Contacts (dynamic, multiple) -->
+                            <!-- SECTION 5: Emergency Contacts -->
                             <div class="form-section">
-                                <h3>Emergency Contacts</h3>
+                                <div class="form-section-header">
+                                    <h3>Emergency Contacts</h3>
+                                </div>
                                 <div id="emergency-contacts-list">
                                     <!-- Dynamic contact entries rendered by JS -->
                                 </div>
@@ -262,13 +370,16 @@
                                 </button>
                             </div>
 
-                            <!-- SECTION 3: Medical Information -->
+                            <!-- SECTION 6: Medical Information -->
                             <div class="form-section">
-                                <h3>Medical Information</h3>
+                                <div class="form-section-header">
+                                    <h3>Medical Information</h3>
+                                    <span class="section-optional-badge">optional</span>
+                                </div>
                                 <div class="form-group">
                                     <label for="profile-medical">Medical Conditions</label>
                                     <textarea id="profile-medical" rows="2"
-                                        placeholder="Any medical conditions, allergies, or medications..."></textarea>
+                                        placeholder="Any medical conditions, allergies, or medications…"></textarea>
                                 </div>
                                 <div class="form-group">
                                     <label>Doctors / Medical Providers</label>
@@ -281,9 +392,12 @@
                                 </div>
                             </div>
 
-                            <!-- SECTION 4: Personal Details -->
+                            <!-- SECTION 7: Personal Details & Accessibility -->
                             <div class="form-section">
-                                <h3>Personal Details</h3>
+                                <div class="form-section-header">
+                                    <h3>Personal Details</h3>
+                                    <span class="section-optional-badge">optional</span>
+                                </div>
                                 <div class="form-group">
                                     <label for="profile-hobbies">Hobbies &amp; Interests</label>
                                     <textarea id="profile-hobbies" rows="2"
@@ -292,14 +406,77 @@
                                 <div class="form-group">
                                     <label for="profile-notes">Additional Notes</label>
                                     <textarea id="profile-notes" rows="2"
-                                        placeholder="Anything else you'd like me to remember?"></textarea>
+                                        placeholder="Anything else you'd like Aegis to remember?"></textarea>
                                 </div>
                             </div>
 
-                            <!-- SECTION 5: Preferences -->
+                            <!-- SECTION 8: Emotional Anchors -->
                             <div class="form-section">
-                                <h3>Preferences</h3>
+                                <div class="form-section-header">
+                                    <h3>Emotional Anchors</h3>
+                                    <span class="section-optional-badge">optional</span>
+                                </div>
+                                <p class="section-desc">These help Aegis naturally reference the people and places that
+                                    matter most to you.</p>
+                                <div class="form-group">
+                                    <label for="profile-important-people">Important People</label>
+                                    <textarea id="profile-important-people" rows="2"
+                                        placeholder="e.g. My daughter Sarah, my friend Tom from church"></textarea>
+                                </div>
                                 <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="profile-music-era">Favourite Music Era</label>
+                                        <input type="text" id="profile-music-era"
+                                            placeholder="e.g. 1960s Motown, Classical">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profile-favourite-place">Favourite Place</label>
+                                        <input type="text" id="profile-favourite-place"
+                                            placeholder="e.g. The cottage by the lake">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION 9: Accessibility Enhancements -->
+                            <div class="form-section">
+                                <div class="form-section-header">
+                                    <h3>Accessibility &amp; Display</h3>
+                                    <span class="section-optional-badge">optional</span>
+                                </div>
+                                <div class="toggle-row">
+                                    <div class="toggle-item">
+                                        <div class="toggle-label-group">
+                                            <span class="toggle-label">High Contrast Mode</span>
+                                            <span class="toggle-desc">Stronger colour contrast for easier reading</span>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="profile-high-contrast">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="toggle-item">
+                                        <div class="toggle-label-group">
+                                            <span class="toggle-label">Reduced Animation</span>
+                                            <span class="toggle-desc">Calmer experience with fewer moving
+                                                elements</span>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="profile-reduced-motion">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="toggle-item">
+                                        <div class="toggle-label-group">
+                                            <span class="toggle-label">Text-to-Speech</span>
+                                            <span class="toggle-desc">Aegis reads responses aloud</span>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="profile-tts">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-row" style="margin-top: var(--spacing-lg);">
                                     <div class="form-group">
                                         <label for="profile-voice-speed">Voice Speed</label>
                                         <select id="profile-voice-speed">
@@ -318,7 +495,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-theme">Theme</label>
+                                    <label for="profile-theme">Colour Theme</label>
                                     <select id="profile-theme">
                                         <option value="default">Normal (Default)</option>
                                         <option value="ocean">Ocean Breeze</option>
@@ -334,6 +511,7 @@
                     </div><!-- /profile-container -->
                 </div><!-- /page-content -->
             </section>
+
         </main>
     </div>
 
