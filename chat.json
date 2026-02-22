@@ -196,5 +196,17 @@
         "timestamp": "2026-02-20T21:44:01.975696",
         "sender": "Aegis AI",
         "content": "Hello again, John. It's good to hear from you. How are you doing this evening?"
+    },
+    {
+        "id": "bbb5008f-8fc8-4c71-ab7e-8618bb26d422",
+        "timestamp": "2026-02-22T13:16:42.697590",
+        "sender": "User",
+        "content": "hi"
+    },
+    {
+        "id": "83b3876c-cff4-4349-8611-a2c643b4c533",
+        "timestamp": "2026-02-22T13:16:42.697598",
+        "sender": "Aegis AI",
+        "content": "Hello there, Eleanor. It's lovely to hear from you. How are you doing this fine afternoon?"
     }
 ]
