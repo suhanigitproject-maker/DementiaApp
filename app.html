@@ -8,6 +8,7 @@
         content="A compassionate AI memory companion for elderly people, helping organize routines, preserve memories, and stay connected with family.">
     <title>Aegis AI</title>
     <link rel="stylesheet" href="style.css">
+    <script src="translations.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -18,18 +19,19 @@
         <!-- Persistent Header -->
         <header class="global-header">
             <h1 class="header-title">Aegis AI</h1>
-            <p class="header-subtitle">Your space to organize routines, preserve memories, and stay connected.</p>
+            <p class="header-subtitle" data-i18n="header_subtitle">Your space to organize routines, preserve memories,
+                and stay connected.</p>
         </header>
 
         <!-- Tab Navigation -->
         <nav class="tab-navigation">
-            <button class="tab-button active" data-tab="home">Home</button>
-            <button class="tab-button" data-tab="chat">Chat</button>
-            <button class="tab-button" data-tab="routines">Routines</button>
-            <button class="tab-button" data-tab="memories">Memories</button>
-            <button class="tab-button" data-tab="family">Family</button>
-            <button class="tab-button" data-tab="notes">Notes</button>
-            <button class="tab-button" data-tab="profile">Profile</button>
+            <button class="tab-button active" data-tab="home" data-i18n="tab_home">Home</button>
+            <button class="tab-button" data-tab="chat" data-i18n="tab_chat">Chat</button>
+            <button class="tab-button" data-tab="routines" data-i18n="tab_routines">Routines</button>
+            <button class="tab-button" data-tab="memories" data-i18n="tab_memories">Memories</button>
+            <button class="tab-button" data-tab="family" data-i18n="tab_family">Family</button>
+            <button class="tab-button" data-tab="notes" data-i18n="tab_notes">Notes</button>
+            <button class="tab-button" data-tab="profile" data-i18n="tab_profile">Profile</button>
         </nav>
 
         <!-- Tab Contents -->
@@ -246,9 +248,10 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="profile-languages">Languages Spoken <span
-                                                class="optional-tag">optional</span></label>
-                                        <input type="text" id="profile-languages" placeholder="e.g. English, Spanish">
+                                        <label>Languages Spoken <span class="optional-tag">optional</span></label>
+                                        <div class="lang-chip-grid" id="languages-spoken-grid">
+                                            <!-- Populated by JS from ALL_SPOKEN_LANGUAGES -->
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -256,6 +259,15 @@
                                             class="optional-tag">optional</span></label>
                                     <input type="text" id="profile-cultural-bg"
                                         placeholder="e.g. traditions, holidays, heritage">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-app-language">App Language <span
+                                            class="optional-tag">optional</span></label>
+                                    <select id="profile-app-language">
+                                        <!-- Populated by JS from SUPPORTED_APP_LANGUAGES -->
+                                    </select>
+                                    <span class="field-hint">Controls all buttons, tabs, labels, and the AI chat
+                                        language. Changes apply after saving.</span>
                                 </div>
                             </div>
 

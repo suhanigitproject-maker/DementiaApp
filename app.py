@@ -445,10 +445,37 @@ def chat():
             memories = load_memories()
             family = load_family()
             past_chat = load_chat_history_data()
-            
+
+            # ---- Language context ----
+            app_language = profile.get('app_language', 'en')
+            languages_spoken = profile.get('languages_spoken', [])
+            if isinstance(languages_spoken, str):
+                languages_spoken = [l.strip() for l in languages_spoken.split(',') if l.strip()]
+
+            LANG_NAMES = {
+                'en': 'English', 'fr': 'French', 'es': 'Spanish', 'de': 'German',
+                'it': 'Italian', 'pt': 'Portuguese', 'hi': 'Hindi', 'ar': 'Arabic',
+                'zh': 'Mandarin Chinese', 'ja': 'Japanese', 'ko': 'Korean', 'pa': 'Punjabi',
+            }
+            primary_lang_name = LANG_NAMES.get(app_language, app_language)
+            spoken_list = ', '.join(languages_spoken) if languages_spoken else primary_lang_name
+
+            language_instructions = f"""
+LANGUAGE SETTINGS:
+- Primary App Language: {primary_lang_name} (code: {app_language})
+  → You MUST respond in {primary_lang_name} by default in every message.
+- Languages the user also speaks: {spoken_list}
+  → If the user writes in any of these languages, switch smoothly to that language without comment or confusion.
+  → Do NOT explain the language switch; simply continue naturally.
+- If the user writes in a language NOT listed above:
+  → Politely ask in {primary_lang_name} whether they would like to continue in that language.
+  → If they confirm, continue that conversation in the new language.
+  → Do NOT permanently change App Language or add it to their spoken languages.
+  → At the start of the NEXT conversation, revert to {primary_lang_name}."""
+
             # Format Personal Context
             context_parts = []
-            
+
             # 1. Profile Context
             profile_text = "USER PROFILE:\n"
             if profile.get('name'): profile_text += f"- Name: {profile['name']}\n"
@@ -456,21 +483,21 @@ def chat():
             if profile.get('medical_conditions'): profile_text += f"- Medical Context: {profile['medical_conditions']}\n"
             if profile.get('hobbies'): profile_text += f"- Interests: {profile['hobbies']}\n"
             context_parts.append(profile_text)
-            
+
             # 2. Routine Context
             if routines:
                 routine_text = "CURRENT ROUTINES:\n"
                 for r in routines:
                     routine_text += f"- {r.get('title')} at {r.get('time')} ({r.get('days')})\n"
                 context_parts.append(routine_text)
-            
+
             # 3. Memory Context
             if memories.get('memories'):
                 memory_text = "STORED MEMORIES:\n"
                 for m in memories['memories']:
                     memory_text += f"- {m.get('title')}: {m.get('description')}\n"
                 context_parts.append(memory_text)
-                
+
             # 4. Family Context
             if family:
                 family_text = "FAMILY & CONTACTS:\n"
@@ -479,27 +506,27 @@ def chat():
                     if f.get('birthday'): family_text += f" - Birthday: {f.get('birthday')}"
                     family_text += "\n"
                 context_parts.append(family_text)
-                
+
             # 5. Past Chat Context (Latest 10 messages for brevity)
             if past_chat:
                 chat_text = "PAST CONVERSATIONS (RECAP):\n"
                 for msg in past_chat[-10:]:
                     chat_text += f"[{msg.get('timestamp')}] {msg.get('sender')}: {msg.get('content')}\n"
                 context_parts.append(chat_text)
-            
+
             full_context = "\n\n".join(context_parts)
-            
+
             conversation_history[session_id] = [
                 {
                     "role": "user",
-                    "parts": [{"text": SYSTEM_PROMPT + "\n\nENVIRONMENT CONTEXT:\nCurrent Time: " + datetime.now().strftime("%Y-%m-%d %H:%M") + "\n\n" + full_context}]
+                    "parts": [{"text": SYSTEM_PROMPT + language_instructions + "\n\nENVIRONMENT CONTEXT:\nCurrent Time: " + datetime.now().strftime("%Y-%m-%d %H:%M") + "\n\n" + full_context}]
                 },
                 {
                     "role": "model",
-                    "parts": [{"text": "I understand. I have loaded all your personal context including routines, memories, family details, and our previous conversations. I will use this information to provide personalized, accurate responses while maintaining a warm, conversational tone."}]
+                    "parts": [{"text": f"I understand. I will respond primarily in {primary_lang_name} and adapt seamlessly if you speak in {spoken_list}. I have loaded all your personal context and am ready to help."}]
                 }
             ]
-        
+
         # Add user message to history, injecting Double Mention hint if applicable
         user_turn_text = user_message
         if repeated_topic:

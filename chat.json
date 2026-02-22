@@ -208,5 +208,101 @@
         "timestamp": "2026-02-22T13:16:42.697598",
         "sender": "Aegis AI",
         "content": "Hello there, Eleanor. It's lovely to hear from you. How are you doing this fine afternoon?"
+    },
+    {
+        "id": "3c849906-c15b-49e9-99c1-b8c6e7901e24",
+        "timestamp": "2026-02-22T13:21:27.035651",
+        "sender": "User",
+        "content": "Je suis une croissant"
+    },
+    {
+        "id": "17ab6e79-98fb-487b-8d31-2eb8cda1d26e",
+        "timestamp": "2026-02-22T13:21:27.035668",
+        "sender": "Aegis AI",
+        "content": "Oh, that's a fun way to put it, Eleanor! You know, that makes me think of your memory about 'Baking Chocolate Cake'. You mentioned trying a new recipe from an old cookbook and how it turned out just perfect. Baking can be such a joy, can't it?"
+    },
+    {
+        "id": "e1fd8053-f59b-4f3f-b4b5-86f1e08f3f1f",
+        "timestamp": "2026-02-22T13:22:04.255420",
+        "sender": "User",
+        "content": "Es-tu parle en francais??"
+    },
+    {
+        "id": "af50f368-812b-440f-bc85-67e46730f85f",
+        "timestamp": "2026-02-22T13:22:04.255529",
+        "sender": "Aegis AI",
+        "content": "I can understand some French, Eleanor, and I'm happy to chat with you in whatever language feels most comfortable. We can certainly try speaking a bit of French, or we can stick to English. Whatever you prefer!"
+    },
+    {
+        "id": "6d2e0e79-63a8-48b4-a3a1-676d4579bc4e",
+        "timestamp": "2026-02-22T13:22:20.089323",
+        "sender": "User",
+        "content": "francais sil-vous-plait!"
+    },
+    {
+        "id": "c2d9bb76-5f1c-423b-ab30-40fbe2262745",
+        "timestamp": "2026-02-22T13:22:20.089328",
+        "sender": "Aegis AI",
+        "content": "D'accord, Eleanor! Fran\u00e7ais, c'est tr\u00e8s bien. You've mentioned wanting to speak French a couple of times now, and it sounds like it's important to you. Would you like me to save this as a memory, so we can remember your preference for speaking French together?"
+    },
+    {
+        "id": "eb29132c-925b-4b26-b22e-53f5eee7f35a",
+        "timestamp": "2026-02-22T13:22:39.300946",
+        "sender": "User",
+        "content": "Merci!"
+    },
+    {
+        "id": "678ef2c4-ace5-4009-bafa-4f825276fe4e",
+        "timestamp": "2026-02-22T13:22:39.300958",
+        "sender": "Aegis AI",
+        "content": "De rien, Eleanor! Je suis contente de pouvoir communiquer avec vous en fran\u00e7ais. Comment allez-vous aujourd'hui?"
+    },
+    {
+        "id": "420715a9-8768-47b5-8d79-7c445d3bf165",
+        "timestamp": "2026-02-22T13:24:01.058460",
+        "sender": "User",
+        "content": "Quoi d'autre lagues parlez-vous??"
+    },
+    {
+        "id": "c8dae4a0-1552-4f78-abad-85c03c39828f",
+        "timestamp": "2026-02-22T13:24:01.058472",
+        "sender": "Aegis AI",
+        "content": "Je parle plusieurs langues, Eleanor, mais ma sp\u00e9cialit\u00e9 est de communiquer avec vous de la mani\u00e8re qui vous est la plus agr\u00e9able. Je peux comprendre et r\u00e9pondre en fran\u00e7ais, et bien s\u00fbr, en anglais aussi. Mon but est de rendre notre conversation aussi fluide et confortable que possible pour vous."
+    },
+    {
+        "id": "c9424483-d017-4471-a962-dca01b9bb090",
+        "timestamp": "2026-02-22T13:24:24.828020",
+        "sender": "User",
+        "content": "como estas??"
+    },
+    {
+        "id": "c76fccf0-9a82-499a-841e-44c81f019deb",
+        "timestamp": "2026-02-22T13:24:24.828029",
+        "sender": "Aegis AI",
+        "content": "Hola, Eleanor! Je peux comprendre un peu d'espagnol aussi. Je vais bien, merci de demander. Et vous, comment allez-vous aujourd'hui?"
+    },
+    {
+        "id": "deb92aa8-594f-4c50-922f-9e9aad57a938",
+        "timestamp": "2026-02-22T13:24:52.228992",
+        "sender": "User",
+        "content": "\u00bfPuedes hablar en espa\u00f1ol?"
+    },
+    {
+        "id": "ed318430-403e-4390-8675-e3ed2e42ade6",
+        "timestamp": "2026-02-22T13:24:52.229005",
+        "sender": "Aegis AI",
+        "content": "S\u00ed, Eleanor, puedo entender y responder en espa\u00f1ol. Es un placer poder comunicarme contigo en el idioma que prefieras. \u00bfC\u00f3mo te gustar\u00eda continuar nuestra conversaci\u00f3n hoy?"
+    },
+    {
+        "id": "2e3a14f2-7369-4c30-aefc-543fe81326b5",
+        "timestamp": "2026-02-22T13:25:20.806127",
+        "sender": "User",
+        "content": "Dime exactamente qu\u00e9 idiomas hablas."
+    },
+    {
+        "id": "dcceb37e-58a3-43d7-887d-55d27df9d2c3",
+        "timestamp": "2026-02-22T13:25:20.806133",
+        "sender": "Aegis AI",
+        "content": "Eleanor, I'm designed to be able to understand and communicate in many languages. While I can process and respond in French and Spanish, as we've just seen, my primary language for our conversations is English. My main goal is to make sure we can connect in a way that feels best for you, so please don't hesitate to use whichever language you feel most comfortable with."
     }
 ]

@@ -23,6 +23,15 @@
       "description": "Planted tulips in spring, loved the colours.",
       "mediaPath": null,
       "source": "manual"
+    },
+    {
+      "id": "a771ab4a-8dc5-47d4-8ec3-c8c06febec5f",
+      "title": "Preference for French",
+      "date": "2026-02-22",
+      "description": "Eleanor has expressed a desire to communicate in French.",
+      "mediaPath": null,
+      "source": "chat",
+      "chatRef": "6d2e0e79-63a8-48b4-a3a1-676d4579bc4e"
     }
   ],
   "interests": [
@@ -54,5 +63,5 @@
   ],
   "medications": [],
   "adaptive_categories": {},
-  "last_updated": "2026-02-21T10:28:37.088247"
+  "last_updated": "2026-02-22T13:22:26.283369"
 }

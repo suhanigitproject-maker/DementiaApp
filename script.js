@@ -8,6 +8,98 @@ let currentRoutineView = 'today';
 let currentMemoryFilter = 'all';
 let themeAnimRAF = null; // requestAnimationFrame handle for theme animations
 
+// ── i18n state ──────────────────────────────────────────────
+let currentAppLang = 'en';       // active language code
+let selectedSpokenLangs = [];    // array of language name strings
+
+/**
+ * Apply UI translations for the given language code.
+ * Walks all [data-i18n] elements and replaces text.
+ * Sets html[dir] for RTL languages.
+ */
+function applyTranslation(lang) {
+    currentAppLang = lang || 'en';
+    const dict = TRANSLATIONS[currentAppLang] || TRANSLATIONS.en;
+
+    // Replace all tagged static elements
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key] !== undefined) el.textContent = dict[key];
+    });
+
+    // Replace placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key] !== undefined) el.placeholder = dict[key];
+    });
+
+    // RTL for Arabic
+    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+    // Re-render dynamic content that includes translatable strings
+    // (called lazily; these fns are no-ops if not yet initialised)
+    if (typeof renderRoutines === 'function') renderRoutines();
+    if (typeof renderMemories === 'function') renderMemories();
+    if (typeof renderFamilyTab === 'function') renderFamilyTab();
+    if (typeof renderNotesTab === 'function') renderNotesTab();
+    if (typeof renderHomeCards === 'function') renderHomeCards();
+
+    // Update chat placeholder
+    const chatInput = document.getElementById('message-input');
+    if (chatInput && dict.chat_placeholder) chatInput.placeholder = dict.chat_placeholder;
+
+    // Update floating save button
+    const fsb = document.getElementById('floating-save-profile-btn');
+    if (fsb && dict.profile_save) fsb.innerHTML = dict.profile_save;
+
+    // Update delete modal buttons
+    const confirmBtn = document.getElementById('confirm-delete-entry-btn');
+    if (confirmBtn && dict.delete_confirm_btn) confirmBtn.textContent = dict.delete_confirm_btn;
+    const cancelBtns = document.querySelectorAll('[onclick="cancelDeleteEntry()"]');
+    cancelBtns.forEach(b => { if (dict.delete_cancel_btn) b.textContent = dict.delete_cancel_btn; });
+}
+
+/**
+ * Render the language chip multi-select grid and restore selections.
+ */
+function initLangChipGrid(selectedLangs) {
+    const grid = document.getElementById('languages-spoken-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    ALL_SPOKEN_LANGUAGES.forEach(lang => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'lang-chip' + (selectedLangs.includes(lang) ? ' selected' : '');
+        chip.innerHTML = `<span class="chip-check">✓</span>${lang}`;
+        chip.addEventListener('click', () => {
+            chip.classList.toggle('selected');
+        });
+        grid.appendChild(chip);
+    });
+}
+
+/**
+ * Read which language chips are currently selected.
+ */
+function getSelectedSpokenLangs() {
+    const grid = document.getElementById('languages-spoken-grid');
+    if (!grid) return [];
+    return Array.from(grid.querySelectorAll('.lang-chip.selected'))
+        .map(c => c.textContent.replace('✓', '').trim());
+}
+
+/**
+ * Populate the App Language single-select dropdown.
+ */
+function initAppLanguageDropdown(selectedCode) {
+    const sel = document.getElementById('profile-app-language');
+    if (!sel || typeof SUPPORTED_APP_LANGUAGES === 'undefined') return;
+    sel.innerHTML = SUPPORTED_APP_LANGUAGES.map(l =>
+        `<option value="${l.code}" ${l.code === selectedCode ? 'selected' : ''}>${l.name}</option>`
+    ).join('');
+}
+
+
 // ===================================
 // THEME TRANSITION ANIMATIONS
 // ===================================
@@ -1741,8 +1833,15 @@ async function loadProfile() {
             // Identity & Context
             document.getElementById('profile-preferred-name').value = profile.preferred_name || '';
             document.getElementById('profile-pronouns').value = profile.pronouns || '';
-            document.getElementById('profile-languages').value = profile.languages || '';
             document.getElementById('profile-cultural-bg').value = profile.cultural_bg || '';
+
+            // Language fields
+            const savedSpoken = Array.isArray(profile.languages_spoken) ? profile.languages_spoken : [];
+            const savedAppLang = profile.app_language || 'en';
+            initLangChipGrid(savedSpoken);
+            initAppLanguageDropdown(savedAppLang);
+            // Apply translation immediately so page reflects saved language
+            applyTranslation(savedAppLang);
 
             // Cognitive & Support Context
             document.getElementById('profile-memory-level').value = profile.memory_level || '';
@@ -1815,6 +1914,10 @@ function initProfile() {
     document.getElementById('add-emergency-contact-btn').addEventListener('click', addEmergencyContact);
     document.getElementById('add-doctor-btn').addEventListener('click', addDoctor);
 
+    // Initialise language widgets with defaults (overwritten by loadProfile)
+    initLangChipGrid([]);
+    initAppLanguageDropdown('en');
+
     // Apply theme live AND play the transition animation when dropdown changes
     document.getElementById('profile-theme').addEventListener('change', (e) => {
         applyTheme(e.target.value);
@@ -1857,7 +1960,8 @@ async function saveProfile() {
         // Identity & Context
         preferred_name: document.getElementById('profile-preferred-name').value.trim(),
         pronouns: document.getElementById('profile-pronouns').value,
-        languages: document.getElementById('profile-languages').value.trim(),
+        languages_spoken: getSelectedSpokenLangs(),
+        app_language: document.getElementById('profile-app-language')?.value || 'en',
         cultural_bg: document.getElementById('profile-cultural-bg').value.trim(),
 
         // Cognitive & Support Context
@@ -1917,7 +2021,9 @@ async function saveProfile() {
         if (response.ok) {
             applyTheme(profileData.preferences.theme);
             applyAccessibility(profileData.accessibility);
-            showToast('Profile saved successfully!', 'success');
+            applyTranslation(profileData.app_language);  // switch UI language
+            const savedMsg = t('profile_saved', profileData.app_language);
+            showToast(savedMsg, 'success');
         } else {
             throw new Error('Failed to save');
         }

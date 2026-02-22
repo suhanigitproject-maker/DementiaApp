@@ -2316,3 +2316,76 @@ body.reduced-motion *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.1ms !important;
 }
+
+/* ── Language chip multi-select grid ── */
+.lang-chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    max-height: 180px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    background: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+}
+
+.lang-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--radius-full);
+    border: 1.5px solid var(--color-gray-300);
+    background: var(--color-white);
+    color: var(--color-gray-600);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.lang-chip:hover {
+    border-color: var(--color-teal);
+    color: var(--color-teal);
+    background: var(--color-gray-50);
+}
+
+.lang-chip.selected {
+    background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-sky) 100%);
+    border-color: transparent;
+    color: var(--color-white);
+    font-weight: 600;
+}
+
+.lang-chip .chip-check {
+    font-size: 0.7rem;
+    display: none;
+}
+
+.lang-chip.selected .chip-check {
+    display: inline;
+}
+
+/* ── RTL support for Arabic ── */
+html[dir="rtl"] {
+    text-align: right;
+}
+
+html[dir="rtl"] .tab-navigation {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .form-row {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .toggle-item {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .profile-entry-header {
+    flex-direction: row-reverse;
+}
