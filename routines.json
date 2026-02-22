@@ -1,32 +1,22 @@
 [
   {
-    "days": [
-      "Mon",
-      "Wed",
-      "Fri"
-    ],
-    "description": "30 minute walk",
-    "id": "c96117e6-e594-45d9-ba53-1fd78ffd9e8f",
-    "lastCompleted": "2026-02-16",
-    "mediaPath": null,
-    "paused": false,
+    "id": "4a7fe8e9-c03f-413d-bc6e-562ab9961860",
+    "title": "Morning Walk",
+    "description": "Go to walk in the nearby park.",
+    "time": "08:00",
     "reminder": "0",
-    "time": "07:00",
-    "title": "Morning Walk"
-  },
-  {
     "days": [
       "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
       "Sun"
     ],
-    "description": "white pills on the kitchen counter",
-    "id": "cd2aa338-f5bf-4acb-b19e-4f42a7e15e31",
-    "lastCompleted": null,
-    "mediaPath": "/uploads/baeccbfb-aaa2-4966-b165-110758c79680_DNA EXTRACTION.png",
+    "mediaPath": null,
     "paused": false,
-    "reminder": "0",
-    "time": "11:30",
-    "title": "Take Medication"
+    "lastCompleted": null
   },
   {
     "id": "e49b95ef-1ce4-4eb7-b756-0ba262d012bf",
@@ -38,7 +28,10 @@
       "Mon",
       "Tue",
       "Wed",
-      "Thu"
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun"
     ],
     "mediaPath": null,
     "paused": false,

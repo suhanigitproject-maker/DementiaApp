@@ -16,8 +16,19 @@ CORS(app, resources={
     }
 })
 
-from dotenv import load_dotenv
-load_dotenv()  # reads .env into os.environ
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # dotenv not installed — read .env manually
+    _env_path = os.path.join(os.path.dirname(__file__), '.env')
+    if os.path.exists(_env_path):
+        with open(_env_path) as _f:
+            for _line in _f:
+                _line = _line.strip()
+                if _line and not _line.startswith('#') and '=' in _line:
+                    _k, _v = _line.split('=', 1)
+                    os.environ.setdefault(_k.strip(), _v.strip())
 
 # Configure Gemini API — key lives in .env, never in source code
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
@@ -833,4 +844,4 @@ if __name__ == '__main__':
     print("🚀 Starting Chat Server...")
     print("📡 Server running on http://localhost:5001")
     print("💬 Chat endpoint: http://localhost:5001/api/chat")
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5001, use_reloader=False)
