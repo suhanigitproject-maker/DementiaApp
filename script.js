@@ -21,7 +21,7 @@ function applyTranslation(lang) {
     currentAppLang = lang || 'en';
     const dict = TRANSLATIONS[currentAppLang] || TRANSLATIONS.en;
 
-    // Replace all tagged static elements
+    // Replace all tagged static elements (text content)
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (dict[key] !== undefined) el.textContent = dict[key];
@@ -33,31 +33,33 @@ function applyTranslation(lang) {
         if (dict[key] !== undefined) el.placeholder = dict[key];
     });
 
+    // Replace title attributes (e.g. tooltip on the + quick-note button)
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (dict[key] !== undefined) el.title = dict[key];
+    });
+
     // RTL for Arabic
     document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
 
-    // Re-render dynamic content that includes translatable strings
-    // (called lazily; these fns are no-ops if not yet initialised)
+    // Re-render dynamic content so JS-generated strings also update
     if (typeof renderRoutines === 'function') renderRoutines();
     if (typeof renderMemories === 'function') renderMemories();
-    if (typeof renderFamilyTab === 'function') renderFamilyTab();
+    if (typeof renderFamily === 'function') renderFamily();
     if (typeof renderNotesTab === 'function') renderNotesTab();
-    if (typeof renderHomeCards === 'function') renderHomeCards();
+    if (typeof renderAllEmergencyContacts === 'function') renderAllEmergencyContacts();
+    if (typeof renderAllDoctors === 'function') renderAllDoctors();
+    if (typeof renderHomeTab === 'function') renderHomeTab();
 
-    // Update chat placeholder
-    const chatInput = document.getElementById('message-input');
+    // Update chat placeholder directly (in case it has no data-i18n-placeholder yet)
+    const chatInput = document.getElementById('chat-input');
     if (chatInput && dict.chat_placeholder) chatInput.placeholder = dict.chat_placeholder;
 
-    // Update floating save button
-    const fsb = document.getElementById('floating-save-profile-btn');
-    if (fsb && dict.profile_save) fsb.innerHTML = dict.profile_save;
-
-    // Update delete modal buttons
-    const confirmBtn = document.getElementById('confirm-delete-entry-btn');
-    if (confirmBtn && dict.delete_confirm_btn) confirmBtn.textContent = dict.delete_confirm_btn;
-    const cancelBtns = document.querySelectorAll('[onclick="cancelDeleteEntry()"]');
-    cancelBtns.forEach(b => { if (dict.delete_cancel_btn) b.textContent = dict.delete_cancel_btn; });
+    // Update floating save button label
+    const fsbLabel = document.querySelector('#floating-save-profile-btn .fsb-label');
+    if (fsbLabel && dict.profile_save_label) fsbLabel.textContent = dict.profile_save_label;
 }
+
 
 /**
  * Render the language chip multi-select grid and restore selections.
@@ -470,10 +472,10 @@ function formatDate(dateStr) {
 }
 
 function formatDays(days) {
-    if (!days || days.length === 0) return 'No days';
+    if (!days || days.length === 0) return t('msg_no_days', currentAppLang);
     const dayMap = {
-        'Mon': 'M', 'Tue': 'T', 'Wed': 'W', 'Thu': 'Th',
-        'Fri': 'F', 'Sat': 'Sa', 'Sun': 'Su'
+        'Mon': t('day_mon', currentAppLang), 'Tue': t('day_tue', currentAppLang), 'Wed': t('day_wed', currentAppLang), 'Thu': t('day_thu', currentAppLang),
+        'Fri': t('day_fri', currentAppLang), 'Sat': t('day_sat', currentAppLang), 'Sun': t('day_sun', currentAppLang)
     };
     return days.map(d => dayMap[d] || d).join(' ');
 }
@@ -511,7 +513,7 @@ function renderHomeTodayRoutines() {
         .slice(0, 3); // Show up to 3
 
     if (todayRoutines.length === 0) {
-        container.innerHTML = '<div class="home-empty">No routines scheduled for today</div>';
+        container.innerHTML = `<div class="home-empty">${t('home_routines_empty', currentAppLang)}</div>`;
         return;
     }
 
@@ -537,7 +539,7 @@ function renderHomeRecentMemories() {
         .slice(0, 2);
 
     if (recentMemories.length === 0) {
-        container.innerHTML = '<div class="home-empty">No memories yet</div>';
+        container.innerHTML = `<div class="home-empty">${t('home_memories_empty', currentAppLang)}</div>`;
         return;
     }
 
@@ -563,7 +565,7 @@ function renderHomeFamilyUpdates() {
     const familyMembers = family.slice(0, 2);
 
     if (familyMembers.length === 0) {
-        container.innerHTML = '<div class="home-empty">No family members added yet</div>';
+        container.innerHTML = `<div class="home-empty">${t('home_family_empty', currentAppLang)}</div>`;
         return;
     }
 
@@ -583,7 +585,7 @@ function renderHomeFamilyUpdates() {
 
 function rotateChatPrompt() {
     const prompts = [
-        "Hello! How can I help you today?",
+        t('chat_greeting', currentAppLang),
         "Let's chat and organize your day together!",
         "Hi there! Ready to explore your memories and routines?"
     ];
@@ -656,7 +658,7 @@ function renderRoutines() {
     filteredRoutines.sort((a, b) => a.time.localeCompare(b.time));
 
     if (filteredRoutines.length === 0) {
-        list.innerHTML = `<div class="empty-state">No routines found for ${currentRoutineView === 'today' ? 'today' : 'this view'}.</div>`;
+        list.innerHTML = `<div class="empty-state">${t(currentRoutineView === 'today' ? 'routines_empty_today' : 'routines_empty_all', currentAppLang)}</div>`;
         return;
     }
 
@@ -699,13 +701,13 @@ function createRoutineBox(routine) {
         ${mediaHtml}
         <div class="item-actions">
             <button class="text-button done ${isCompleted ? 'completed' : ''}" onclick="toggleRoutineComplete('${routine.id}')">
-                ${isCompleted ? 'Completed' : 'Mark Done'}
+                ${isCompleted ? t('btn_completed', currentAppLang) : t('btn_mark_done', currentAppLang)}
             </button>
             <button class="text-button" onclick="toggleRoutinePause('${routine.id}')">
-                ${isPaused ? 'Resume' : 'Pause'}
+                ${isPaused ? t('btn_resume', currentAppLang) : t('btn_pause', currentAppLang)}
             </button>
-            <button class="text-button" onclick="editRoutine('${routine.id}')">Edit</button>
-            <button class="text-button delete" onclick="deleteRoutine('${routine.id}')">Delete</button>
+            <button class="text-button" onclick="editRoutine('${routine.id}')">${t('btn_edit', currentAppLang)}</button>
+            <button class="text-button delete" onclick="deleteRoutine('${routine.id}')">${t('btn_delete', currentAppLang)}</button>
         </div>
     `;
 
@@ -759,7 +761,7 @@ function openRoutineModal(id = null) {
     if (id) {
         const routine = routines.find(r => r.id === id);
         if (routine) {
-            title.textContent = 'Edit Routine';
+            title.textContent = t('modal_edit_routine', currentAppLang);
             document.getElementById('routine-id').value = routine.id;
             document.getElementById('routine-name').value = routine.title;
             document.getElementById('routine-time').value = routine.time;
@@ -772,7 +774,7 @@ function openRoutineModal(id = null) {
             });
         }
     } else {
-        title.textContent = 'Add Routine';
+        title.textContent = t('modal_add_routine', currentAppLang);
     }
 
     modal.classList.add('active');
@@ -865,7 +867,7 @@ function deleteRoutine(id) {
         routines = routines.filter(r => r.id !== id);
         await syncRoutines();
         renderRoutines();
-        showToast('Deleted successfully.', 'info');
+        showToast(t('msg_deleted', currentAppLang), 'info');
     });
 }
 
@@ -941,7 +943,8 @@ function renderMemories() {
             'manual': 'Pure ',
             'chat': 'Chat-Derived '
         }[currentMemoryFilter] || '';
-        list.innerHTML = `<div class="empty-state">No ${filterLabel}Memories found.<br><span style="font-size:0.85rem;color:var(--color-gray-400)">${currentMemoryFilter === 'manual' ? 'Add a memory using the "Add Memory" button.' : currentMemoryFilter === 'chat' ? 'Chat-derived memories are saved when you confirm a memory during conversation.' : 'Add a memory or start a chat to create memories.'}</span></div>`;
+        const emptyKey = currentMemoryFilter === 'manual' ? 'memories_empty_manual' : currentMemoryFilter === 'chat' ? 'memories_empty_chat' : 'memories_empty_all';
+        list.innerHTML = `<div class="empty-state">${t(emptyKey, currentAppLang)}</div>`;
         return;
     }
 
@@ -971,10 +974,11 @@ function createMemoryBox(memory) {
         }
     }
 
-    const sourceLabel = memory.source === 'chat' ? 'Chat-Derived' : 'Pure Memory';
+    const sourceLabel = memory.source === 'chat' ? t('mem_label_chat', currentAppLang) : t('mem_label_pure', currentAppLang);
     const sourceBadgeClass = memory.source === 'chat' ? 'memory-badge-chat' : 'memory-badge-manual';
+    const dateStr = memory.date ? formatDate(memory.date) : t('msg_no_date', currentAppLang);
     const chatRefHtml = memory.source === 'chat' && memory.chatRef
-        ? `<span class="memory-chat-ref" title="Chat message ID: ${escapeHtml(memory.chatRef)}">🔗 From chat</span>`
+        ? `<span class="memory-chat-ref" title="Chat message ID: ${escapeHtml(memory.chatRef)}">🔗 ${t('mem_label_from_chat', currentAppLang)}</span>`
         : '';
 
     box.innerHTML = `
@@ -984,13 +988,13 @@ function createMemoryBox(memory) {
             <span class="memory-source-badge ${sourceBadgeClass}">${sourceLabel}</span>
         </div>
         <div class="item-meta">
-            <span>📅 ${formatDate(memory.date)}</span>
+            <span>📅 ${dateStr}</span>
             ${chatRefHtml}
         </div>
         ${memory.description ? `<p class="item-description">${escapeHtml(memory.description)}</p>` : ''}
         <div class="item-actions">
-            <button class="text-button" onclick="editMemory('${memory.id}')">Edit</button>
-            <button class="text-button delete" onclick="deleteMemory('${memory.id}')">Delete</button>
+            <button class="text-button" onclick="editMemory('${memory.id}')">${t('btn_edit', currentAppLang)}</button>
+            <button class="text-button delete" onclick="deleteMemory('${memory.id}')">${t('btn_delete', currentAppLang)}</button>
         </div>
     `;
 
@@ -1036,14 +1040,14 @@ function openMemoryModal(id = null) {
     if (id) {
         const memory = memories.find(m => m.id === id);
         if (memory) {
-            title.textContent = 'Edit Memory';
+            title.textContent = t('modal_edit_memory', currentAppLang);
             document.getElementById('memory-id').value = memory.id;
             document.getElementById('memory-title').value = memory.title;
             document.getElementById('memory-date').value = memory.date || '';
             document.getElementById('memory-description').value = memory.description || '';
         }
     } else {
-        title.textContent = 'Add Memory';
+        title.textContent = t('modal_add_memory', currentAppLang);
     }
 
     modal.classList.add('active');
@@ -1121,7 +1125,7 @@ function deleteMemory(id) {
         memories = memories.filter(m => m.id !== id);
         await syncMemories();
         renderMemories();
-        showToast('Deleted successfully.', 'info');
+        showToast(t('msg_deleted', currentAppLang), 'info');
     });
 }
 
@@ -1162,7 +1166,7 @@ function renderFamily() {
     list.innerHTML = '';
 
     if (family.length === 0) {
-        list.innerHTML = '<div class="empty-state">No family members added yet.</div>';
+        list.innerHTML = `<div class="empty-state">${t('family_empty_list', currentAppLang)}</div>`;
         return;
     }
 
@@ -1189,8 +1193,8 @@ function createFamilyBox(member) {
         ${member.birthday ? `<p class="item-description">🎂 ${formatDate(member.birthday)}</p>` : ''}
         ${member.notes ? `<p class="item-description">${escapeHtml(member.notes)}</p>` : ''}
         <div class="item-actions">
-            <button class="text-button" onclick="editFamily('${member.id}')">Edit</button>
-            <button class="text-button delete" onclick="deleteFamily('${member.id}')">Delete</button>
+            <button class="text-button" onclick="editFamily('${member.id}')">${t('btn_edit', currentAppLang)}</button>
+            <button class="text-button delete" onclick="deleteFamily('${member.id}')">${t('btn_delete', currentAppLang)}</button>
         </div>
     `;
 
@@ -1236,7 +1240,7 @@ function openFamilyModal(id = null) {
     if (id) {
         const member = family.find(f => f.id === id);
         if (member) {
-            title.textContent = 'Edit Family Member';
+            title.textContent = t('modal_edit_family', currentAppLang);
             document.getElementById('family-id').value = member.id;
             document.getElementById('family-name').value = member.name;
             document.getElementById('family-relation').value = member.relation;
@@ -1261,7 +1265,7 @@ function openFamilyModal(id = null) {
             }
         }
     } else {
-        title.textContent = 'Add Family Member';
+        title.textContent = t('modal_add_family', currentAppLang);
     }
 
     modal.classList.add('active');
@@ -1349,7 +1353,7 @@ function deleteFamily(id) {
         family = family.filter(f => f.id !== id);
         await syncFamily();
         renderFamily();
-        showToast('Deleted successfully.', 'info');
+        showToast(t('msg_deleted', currentAppLang), 'info');
     });
 }
 
@@ -1685,7 +1689,7 @@ function renderAllEmergencyContacts() {
     const list = document.getElementById('emergency-contacts-list');
     list.innerHTML = '';
     if (emergencyContacts.length === 0) {
-        list.innerHTML = '<p class="profile-entry-empty">No emergency contacts added yet.</p>';
+        list.innerHTML = `<p class="profile-entry-empty">${t('contacts_empty', currentAppLang)}</p>`;
         return;
     }
     emergencyContacts.forEach((c, i) => list.appendChild(renderEmergencyContactCard(c, i)));
@@ -1710,8 +1714,8 @@ let deleteEntryPendingCallback = null;
  */
 function openDeleteEntryModal(entryLabel, onConfirm) {
     deleteEntryPendingCallback = onConfirm;
-    document.getElementById('delete-entry-message').textContent =
-        `Are you sure you want to remove "${entryLabel}"? This cannot be undone.`;
+    document.getElementById('delete-entry-message').innerHTML =
+        t('confirm_delete', currentAppLang).replace('{0}', escapeHtml(entryLabel));
     document.getElementById('delete-entry-modal').classList.add('active');
 
     const btn = document.getElementById('confirm-delete-entry-btn');
@@ -1770,7 +1774,7 @@ function renderAllDoctors() {
     const list = document.getElementById('doctors-list');
     list.innerHTML = '';
     if (doctors.length === 0) {
-        list.innerHTML = '<p class="profile-entry-empty">No doctors added yet.</p>';
+        list.innerHTML = `<p class="profile-entry-empty">${t('doctors_empty', currentAppLang)}</p>`;
         return;
     }
     doctors.forEach((d, i) => list.appendChild(renderDoctorCard(d, i)));
@@ -2029,7 +2033,7 @@ async function saveProfile() {
         }
     } catch (error) {
         console.error('Error saving profile:', error);
-        showToast('Error saving profile. Please try again.', 'error');
+        showToast(t('profile_error', currentAppLang), 'error');
     }
 }
 
@@ -2055,7 +2059,7 @@ function renderNotesTab() {
         grid.innerHTML = `
             <div class="notes-empty">
                 <div class="notes-empty-icon">📝</div>
-                <p>No notes yet. Click <strong>+ New Note</strong> to get started.</p>
+                <p>${t('notes_empty_list', currentAppLang)}</p>
             </div>`;
         return;
     }
@@ -2073,8 +2077,8 @@ function renderNotesTab() {
             <div class="note-card-header">
                 <span class="note-card-title">${escapeHtml(note.title || 'Untitled Note')}</span>
                 <div class="note-card-actions">
-                    <button class="text-button" onclick="openNoteEditor('${escapeHtml(note.id)}')">Edit</button>
-                    <button class="text-button danger" onclick="deleteNote('${escapeHtml(note.id)}')">Delete</button>
+                    <button class="text-button" onclick="openNoteEditor('${escapeHtml(note.id)}')">${t('btn_edit', currentAppLang)}</button>
+                    <button class="text-button danger" onclick="deleteNote('${escapeHtml(note.id)}')">${t('btn_delete', currentAppLang)}</button>
                 </div>
             </div>
             ${preview ? `<div class="note-card-body">${escapeHtml(preview)}${hasMore ? '…' : ''}</div>` : ''}
@@ -2093,7 +2097,7 @@ function renderHomeNotes() {
             <div class="qn-empty">
                 <div class="qn-empty-icon">📝</div>
                 <p>Want to remember something for later?</p>
-                <button class="qn-prompt-btn" onclick="openNoteEditor()">Write a note</button>
+                <button class="qn-prompt-btn" onclick="openNoteEditor()">${t('btn_write_note', currentAppLang)}</button>
             </div>`;
         return;
     }
@@ -2171,7 +2175,7 @@ async function saveNoteFromEditor() {
             if (!resp.ok) throw new Error('Create failed');
             const data = await resp.json();
             notes.push(data.note);
-            showToast('Note saved!', 'success');
+            showToast(t('note_saved', currentAppLang), 'success');
         }
 
         closeNoteEditor();

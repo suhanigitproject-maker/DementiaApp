@@ -1,7 +1,11 @@
 {
   "preferred_name": "Eleanor",
   "pronouns": "she/her",
-  "languages": "English, French",
+  "languages_spoken": [
+    "English",
+    "French"
+  ],
+  "app_language": "fr",
   "cultural_bg": "",
   "memory_level": "mild",
   "comfort_topics": "Gardening, Baking, Classical Music",

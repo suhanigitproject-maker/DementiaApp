@@ -1,10 +1,5 @@
 [
   {
-    "id": "4a7fe8e9-c03f-413d-bc6e-562ab9961860",
-    "title": "Morning Walk",
-    "description": "Go to walk in the nearby park.",
-    "time": "08:00",
-    "reminder": "0",
     "days": [
       "Mon",
       "Tue",
@@ -14,16 +9,16 @@
       "Sat",
       "Sun"
     ],
+    "description": "Go to walk in the nearby park.",
+    "id": "4a7fe8e9-c03f-413d-bc6e-562ab9961860",
+    "lastCompleted": "2026-02-22",
     "mediaPath": null,
     "paused": false,
-    "lastCompleted": null
+    "reminder": "0",
+    "time": "08:00",
+    "title": "Morning Walk"
   },
   {
-    "id": "e49b95ef-1ce4-4eb7-b756-0ba262d012bf",
-    "title": "Take Medication",
-    "description": "",
-    "time": "10:50",
-    "reminder": "0",
     "days": [
       "Mon",
       "Tue",
@@ -33,8 +28,13 @@
       "Sat",
       "Sun"
     ],
+    "description": "",
+    "id": "e49b95ef-1ce4-4eb7-b756-0ba262d012bf",
+    "lastCompleted": "2026-02-18",
     "mediaPath": null,
     "paused": false,
-    "lastCompleted": "2026-02-18"
+    "reminder": "0",
+    "time": "10:50",
+    "title": "Take Medication"
   }
 ]

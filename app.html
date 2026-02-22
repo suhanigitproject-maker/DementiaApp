@@ -8,7 +8,7 @@
         content="A compassionate AI memory companion for elderly people, helping organize routines, preserve memories, and stay connected with family.">
     <title>Aegis AI</title>
     <link rel="stylesheet" href="style.css">
-    <script src="translations.js"></script>
+    <script src="translations.js?v=3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -46,40 +46,42 @@
                             <!-- Today's Routines Card -->
                             <div class="home-card">
                                 <div class="home-card-header">
-                                    <h3>📅 Today's Routines</h3>
+                                    <h3 data-i18n="home_routines_heading">📅 Today's Routines</h3>
                                 </div>
                                 <div class="home-card-body" id="home-routines">
                                     <!-- Will be populated by JavaScript -->
                                 </div>
                                 <div class="home-card-footer">
-                                    <button class="text-button" onclick="switchTab('routines')">Go to Routines</button>
+                                    <button class="text-button" onclick="switchTab('routines')"
+                                        data-i18n="home_routines_link">Go to Routines</button>
                                 </div>
                             </div>
 
                             <!-- Recent Memories Card -->
                             <div class="home-card">
                                 <div class="home-card-header">
-                                    <h3>📸 Recent Memories</h3>
+                                    <h3 data-i18n="home_memories_heading">📸 Recent Memories</h3>
                                 </div>
                                 <div class="home-card-body" id="home-memories">
                                     <!-- Will be populated by JavaScript -->
                                 </div>
                                 <div class="home-card-footer">
-                                    <button class="text-button" onclick="switchTab('memories')">View All
-                                        Memories</button>
+                                    <button class="text-button" onclick="switchTab('memories')"
+                                        data-i18n="home_memories_link">View All Memories</button>
                                 </div>
                             </div>
 
                             <!-- Family Updates Card -->
                             <div class="home-card">
                                 <div class="home-card-header">
-                                    <h3>👨‍👩‍👧‍👦 Family Updates</h3>
+                                    <h3 data-i18n="home_family_heading">👨‍👩‍👧‍👦 Family Updates</h3>
                                 </div>
                                 <div class="home-card-body" id="home-family">
                                     <!-- Will be populated by JavaScript -->
                                 </div>
                                 <div class="home-card-footer">
-                                    <button class="text-button" onclick="switchTab('family')">Go to Family</button>
+                                    <button class="text-button" onclick="switchTab('family')"
+                                        data-i18n="home_family_link">Go to Family</button>
                                 </div>
                             </div>
 
@@ -91,26 +93,27 @@
                             <!-- Quick Notes Card -->
                             <div class="home-card quick-notes-card" id="quick-notes-home-card">
                                 <div class="home-card-header quick-notes-header">
-                                    <h3>📝 Quick Notes</h3>
+                                    <h3 data-i18n="home_notes_heading">📝 Quick Notes</h3>
                                     <button class="qn-add-btn" onclick="openQuickNoteModal(event)"
-                                        title="Add a note">＋</button>
+                                        data-i18n-title="home_notes_add_title" title="Add a note">＋</button>
                                 </div>
                                 <div class="home-card-body" id="home-notes-preview">
                                     <!-- Populated by JS -->
                                 </div>
                                 <div class="home-card-footer">
-                                    <button class="text-button" onclick="switchTab('notes')">View All Notes</button>
+                                    <button class="text-button" onclick="switchTab('notes')"
+                                        data-i18n="home_notes_link">View All Notes</button>
                                 </div>
                             </div>
 
                             <!-- Chat with Aegis AI Card -->
                             <div class="home-card chat-prompt-card" onclick="switchTab('chat')">
                                 <div class="home-card-header">
-                                    <h3>💬 Chat with Aegis AI</h3>
+                                    <h3 data-i18n="home_chat_heading">💬 Chat with Aegis AI</h3>
                                 </div>
                                 <div class="home-card-body">
-                                    <p class="chat-prompt-text" id="chat-prompt">Hello! I'd love to hear a story today.
-                                        How are you feeling?</p>
+                                    <p class="chat-prompt-text" id="chat-prompt" data-i18n="home_chat_prompt">Hello! I'd
+                                        love to hear a story today. How are you feeling?</p>
                                 </div>
                             </div>
 
@@ -123,8 +126,8 @@
             <section id="notes-tab" class="tab-content">
                 <div class="page-content">
                     <div class="tab-header">
-                        <h2 class="tab-title">📝 My Notes</h2>
-                        <button class="add-button" id="new-note-btn">+ New Note</button>
+                        <h2 class="tab-title" data-i18n="notes_title">📝 My Notes</h2>
+                        <button class="add-button" id="new-note-btn" data-i18n="notes_add">+ New Note</button>
                     </div>
                     <div id="notes-grid" class="notes-grid">
                         <!-- Populated by JS -->
@@ -137,10 +140,12 @@
                 <div class="page-content">
                     <div class="tab-header">
                         <div class="view-toggle">
-                            <button class="toggle-button active" data-view="today">Today</button>
-                            <button class="toggle-button" data-view="all">All Routines</button>
+                            <button class="toggle-button active" data-view="today"
+                                data-i18n="routines_view_today">Today</button>
+                            <button class="toggle-button" data-view="all" data-i18n="routines_view_all">All
+                                Routines</button>
                         </div>
-                        <button class="add-button" id="add-routine-btn">Add Routine</button>
+                        <button class="add-button" id="add-routine-btn" data-i18n="routines_add">Add Routine</button>
                     </div>
                     <div class="content-grid" id="routines-list">
                         <!-- Routines will be populated here -->
@@ -152,13 +157,16 @@
             <section id="memories-tab" class="tab-content">
                 <div class="page-content">
                     <div class="tab-header">
-                        <h2 class="tab-title">My Memories</h2>
+                        <h2 class="tab-title" data-i18n="memories_title">My Memories</h2>
                         <div class="view-toggle" id="memory-filter-toggle">
-                            <button class="toggle-button active" data-filter="all">All Memories</button>
-                            <button class="toggle-button" data-filter="manual">Pure Memories</button>
-                            <button class="toggle-button" data-filter="chat">Chat-Derived Memories</button>
+                            <button class="toggle-button active" data-filter="all" data-i18n="memories_filter_all">All
+                                Memories</button>
+                            <button class="toggle-button" data-filter="manual" data-i18n="memories_filter_pure">Pure
+                                Memories</button>
+                            <button class="toggle-button" data-filter="chat"
+                                data-i18n="memories_filter_chat">Chat-Derived Memories</button>
                         </div>
-                        <button class="add-button" id="add-memory-btn">Add Memory</button>
+                        <button class="add-button" id="add-memory-btn" data-i18n="memories_add">Add Memory</button>
                     </div>
                     <div class="content-grid" id="memories-list">
                         <!-- Memories will be populated here -->
@@ -170,8 +178,8 @@
             <section id="family-tab" class="tab-content">
                 <div class="page-content">
                     <div class="tab-header">
-                        <h2 class="tab-title">Family Members</h2>
-                        <button class="add-button" id="add-family-btn">Add Family Member</button>
+                        <h2 class="tab-title" data-i18n="family_title">Family Members</h2>
+                        <button class="add-button" id="add-family-btn" data-i18n="family_add">Add Family Member</button>
                     </div>
                     <div class="content-grid" id="family-list">
                         <!-- Family members will be populated here -->
@@ -187,29 +195,30 @@
                             <div class="chat-header-main">
                                 <div class="chat-avatar">🤖</div>
                                 <div class="chat-info">
-                                    <h2>Aegis Companion</h2>
-                                    <p class="status">Always here for you</p>
+                                    <h2 data-i18n="chat_title">Aegis Companion</h2>
+                                    <p class="status" data-i18n="chat_status">Always here for you</p>
                                 </div>
                             </div>
                             <div class="chat-actions">
-                                <button class="text-button delete" id="clear-chat-btn">Clear Chat</button>
+                                <button class="text-button delete" id="clear-chat-btn" data-i18n="chat_clear">Clear
+                                    Chat</button>
                             </div>
                         </div>
                         <div class="chat-messages" id="chat-messages">
                             <div class="message ai-message">
                                 <div class="message-avatar">🤖</div>
                                 <div class="message-content">
-                                    <p>Hello! I'm here to listen and chat with you. Feel free to share your stories,
-                                        memories, or anything on your mind. I'd love to hear about your day or reminisce
-                                        about your favorite moments!</p>
-                                    <span class="message-time">Just now</span>
+                                    <p data-i18n="chat_greeting">Hello! I'm here to listen and chat with you. Feel free
+                                        to share your stories, memories, or anything on your mind. I'd love to hear
+                                        about your day or reminisce about your favorite moments!</p>
+                                    <span class="message-time" data-i18n="chat_just_now">Just now</span>
                                 </div>
                             </div>
                         </div>
                         <div class="chat-input-container">
-                            <input type="text" id="chat-input" placeholder="Type a message or share a memory..."
-                                autocomplete="off">
-                            <button class="send-button" id="send-button">Send</button>
+                            <input type="text" id="chat-input" data-i18n-placeholder="chat_placeholder"
+                                placeholder="Type a message or share a memory..." autocomplete="off">
+                            <button class="send-button" id="send-button" data-i18n="chat_send">Send</button>
                         </div>
                     </div>
                 </div>
@@ -219,54 +228,60 @@
             <section id="profile-tab" class="tab-content">
                 <div class="page-content">
                     <div class="profile-container">
-                        <h2 class="tab-title" style="margin-bottom: var(--spacing-xl);">My Profile</h2>
+                        <h2 class="tab-title" style="margin-bottom: var(--spacing-xl);" data-i18n="profile_title">My
+                            Profile</h2>
                         <form id="profile-form">
 
                             <!-- SECTION 1: Identity & Context -->
                             <div class="form-section">
                                 <div class="form-section-header">
-                                    <h3>Identity &amp; Context</h3>
+                                    <h3 data-i18n="sec_identity">Identity &amp; Context</h3>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-preferred-name">Preferred Name <span
-                                            class="required-star">*</span></label>
+                                    <label for="profile-preferred-name" data-i18n="lbl_preferred_name">Preferred Name
+                                        <span class="required-star">*</span></label>
                                     <input type="text" id="profile-preferred-name"
+                                        data-i18n-placeholder="ph_preferred_name"
                                         placeholder="What would you like to be called?" required>
-                                    <span class="field-hint">Used in chat responses and reminders</span>
+                                    <span class="field-hint" data-i18n="hint_preferred_name">Used in chat responses and
+                                        reminders</span>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="profile-pronouns">Pronouns <span
-                                                class="optional-tag">optional</span></label>
+                                        <label for="profile-pronouns" data-i18n="lbl_pronouns">Pronouns <span
+                                                class="optional-tag" data-i18n="opt_tag">optional</span></label>
                                         <select id="profile-pronouns">
-                                            <option value="">Select…</option>
-                                            <option value="he/him">He / Him</option>
-                                            <option value="she/her">She / Her</option>
-                                            <option value="they/them">They / Them</option>
-                                            <option value="other">Other</option>
-                                            <option value="prefer_not">Prefer not to say</option>
+                                            <option value="" data-i18n="pronouns_select">Select…</option>
+                                            <option value="he/him" data-i18n="pronouns_he">He / Him</option>
+                                            <option value="she/her" data-i18n="pronouns_she">She / Her</option>
+                                            <option value="they/them" data-i18n="pronouns_they">They / Them</option>
+                                            <option value="other" data-i18n="pronouns_other">Other</option>
+                                            <option value="prefer_not" data-i18n="pronouns_prefer">Prefer not to say
+                                            </option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Languages Spoken <span class="optional-tag">optional</span></label>
+                                        <label data-i18n="lbl_languages_spoken">Languages Spoken <span
+                                                class="optional-tag" data-i18n="opt_tag">optional</span></label>
                                         <div class="lang-chip-grid" id="languages-spoken-grid">
                                             <!-- Populated by JS from ALL_SPOKEN_LANGUAGES -->
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-cultural-bg">Cultural Background <span
-                                            class="optional-tag">optional</span></label>
-                                    <input type="text" id="profile-cultural-bg"
+                                    <label for="profile-cultural-bg" data-i18n="lbl_cultural_bg">Cultural Background
+                                        <span class="optional-tag" data-i18n="opt_tag">optional</span></label>
+                                    <input type="text" id="profile-cultural-bg" data-i18n-placeholder="ph_cultural_bg"
                                         placeholder="e.g. traditions, holidays, heritage">
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-app-language">App Language <span
-                                            class="optional-tag">optional</span></label>
+                                    <label for="profile-app-language" data-i18n="lbl_app_language">App Language <span
+                                            class="optional-tag" data-i18n="opt_tag">optional</span></label>
                                     <select id="profile-app-language">
                                         <!-- Populated by JS from SUPPORTED_APP_LANGUAGES -->
                                     </select>
-                                    <span class="field-hint">Controls all buttons, tabs, labels, and the AI chat
+                                    <span class="field-hint" data-i18n="hint_app_language">Controls all buttons, tabs,
+                                        labels, and the AI chat
                                         language. Changes apply after saving.</span>
                                 </div>
                             </div>
@@ -274,36 +289,41 @@
                             <!-- SECTION 2: Cognitive & Support Context -->
                             <div class="form-section">
                                 <div class="form-section-header">
-                                    <h3>Cognitive &amp; Support Context</h3>
+                                    <h3 data-i18n="sec_cognitive">Cognitive &amp; Support Context</h3>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-memory-level">Memory Support Level <span
-                                            class="required-star">*</span></label>
+                                    <label for="profile-memory-level" data-i18n="lbl_memory_level">Memory Support Level
+                                        <span class="required-star">*</span></label>
                                     <select id="profile-memory-level" required>
-                                        <option value="">Select level…</option>
-                                        <option value="mild">Mild – occasional reminders helpful</option>
-                                        <option value="moderate">Moderate – regular gentle prompting</option>
-                                        <option value="advanced">Advanced – consistent structured support</option>
+                                        <option value="" data-i18n="mem_level_select">Select level…</option>
+                                        <option value="mild" data-i18n="mem_level_mild">Mild – occasional reminders
+                                            helpful</option>
+                                        <option value="moderate" data-i18n="mem_level_moderate">Moderate – regular
+                                            gentle prompting</option>
+                                        <option value="advanced" data-i18n="mem_level_advanced">Advanced – consistent
+                                            structured support</option>
                                     </select>
-                                    <span class="field-hint">Helps Aegis adjust conversation pacing and support
+                                    <span class="field-hint" data-i18n="hint_memory_level">Helps Aegis adjust
+                                        conversation pacing and support
                                         style</span>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-comfort-topics">Comfort Topics <span
-                                            class="optional-tag">optional</span></label>
+                                    <label for="profile-comfort-topics" data-i18n="lbl_comfort_topics">Comfort Topics
+                                        <span class="optional-tag" data-i18n="opt_tag">optional</span></label>
                                     <textarea id="profile-comfort-topics" rows="2"
+                                        data-i18n-placeholder="ph_comfort_topics"
                                         placeholder="Topics that bring calm or joy (e.g. gardening, music, grandchildren)"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-avoid-topics">Topics to Avoid <span
-                                            class="optional-tag">optional</span></label>
-                                    <textarea id="profile-avoid-topics" rows="2"
+                                    <label for="profile-avoid-topics" data-i18n="lbl_avoid_topics">Topics to Avoid <span
+                                            class="optional-tag" data-i18n="opt_tag">optional</span></label>
+                                    <textarea id="profile-avoid-topics" rows="2" data-i18n-placeholder="ph_avoid_topics"
                                         placeholder="Topics that may cause distress (e.g. news, specific events)"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-triggers">Common Triggers <span
-                                            class="optional-tag">optional</span></label>
-                                    <textarea id="profile-triggers" rows="2"
+                                    <label for="profile-triggers" data-i18n="lbl_triggers">Common Triggers <span
+                                            class="optional-tag" data-i18n="opt_tag">optional</span></label>
+                                    <textarea id="profile-triggers" rows="2" data-i18n-placeholder="ph_triggers"
                                         placeholder="Notes about situations that may cause anxiety or agitation"></textarea>
                                 </div>
                             </div>
@@ -311,25 +331,29 @@
                             <!-- SECTION 3: Daily Rhythm & Preferences -->
                             <div class="form-section">
                                 <div class="form-section-header">
-                                    <h3>Daily Rhythm &amp; Preferences</h3>
-                                    <span class="section-optional-badge">optional</span>
+                                    <h3 data-i18n="sec_daily_rhythm">Daily Rhythm &amp; Preferences</h3>
+                                    <span class="section-optional-badge" data-i18n="opt_tag">optional</span>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="profile-day-type">Time of Day Preference</label>
+                                        <label for="profile-day-type" data-i18n="lbl_day_type">Time of Day
+                                            Preference</label>
                                         <select id="profile-day-type">
-                                            <option value="">No preference</option>
-                                            <option value="morning">🌅 Morning Person</option>
-                                            <option value="evening">🌙 Evening Person</option>
-                                            <option value="afternoon">☀️ Afternoon Person</option>
+                                            <option value="" data-i18n="day_no_pref">No preference</option>
+                                            <option value="morning" data-i18n="day_morning">🌅 Morning Person</option>
+                                            <option value="evening" data-i18n="day_evening">🌙 Evening Person</option>
+                                            <option value="afternoon" data-i18n="day_afternoon">☀️ Afternoon Person
+                                            </option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="profile-reminder-style">Preferred Reminder Style</label>
+                                        <label for="profile-reminder-style" data-i18n="lbl_reminder_style">Preferred
+                                            Reminder Style</label>
                                         <select id="profile-reminder-style">
-                                            <option value="gentle">🌸 Gentle</option>
-                                            <option value="direct">📋 Direct</option>
-                                            <option value="encouraging">✨ Encouraging</option>
+                                            <option value="gentle" data-i18n="reminder_gentle">🌸 Gentle</option>
+                                            <option value="direct" data-i18n="reminder_direct">📋 Direct</option>
+                                            <option value="encouraging" data-i18n="reminder_encouraging">✨ Encouraging
+                                            </option>
                                         </select>
                                     </div>
                                 </div>
@@ -338,32 +362,35 @@
                             <!-- SECTION 4: Basic Information -->
                             <div class="form-section">
                                 <div class="form-section-header">
-                                    <h3>Basic Information</h3>
-                                    <span class="section-optional-badge">optional</span>
+                                    <h3 data-i18n="sec_basic_info">Basic Information</h3>
+                                    <span class="section-optional-badge" data-i18n="opt_tag">optional</span>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-name">Full Name</label>
-                                    <input type="text" id="profile-name" placeholder="E.g. John Doe">
+                                    <label for="profile-name" data-i18n="lbl_full_name">Full Name</label>
+                                    <input type="text" id="profile-name" data-i18n-placeholder="ph_full_name"
+                                        placeholder="E.g. John Doe">
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="profile-age">Age</label>
-                                        <input type="number" id="profile-age" placeholder="Age" min="1" max="120">
+                                        <label for="profile-age" data-i18n="lbl_age">Age</label>
+                                        <input type="number" id="profile-age" data-i18n-placeholder="lbl_age"
+                                            placeholder="Age" min="1" max="120">
                                     </div>
                                     <div class="form-group">
-                                        <label for="profile-gender">Gender</label>
+                                        <label for="profile-gender" data-i18n="lbl_gender">Gender</label>
                                         <select id="profile-gender">
-                                            <option value="">Select…</option>
-                                            <option value="male">Male</option>
-                                            <option value="female">Female</option>
-                                            <option value="other">Other</option>
-                                            <option value="prefer_not_to_say">Prefer not to say</option>
+                                            <option value="" data-i18n="pronouns_select">Select…</option>
+                                            <option value="male" data-i18n="gender_male">Male</option>
+                                            <option value="female" data-i18n="gender_female">Female</option>
+                                            <option value="other" data-i18n="pronouns_other">Other</option>
+                                            <option value="prefer_not_to_say" data-i18n="pronouns_prefer">Prefer not to
+                                                say</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-address">Home Address</label>
-                                    <input type="text" id="profile-address"
+                                    <label for="profile-address" data-i18n="lbl_address">Home Address</label>
+                                    <input type="text" id="profile-address" data-i18n-placeholder="ph_address"
                                         placeholder="E.g. 123 Maple Street, Springfield">
                                 </div>
                             </div>
@@ -371,13 +398,13 @@
                             <!-- SECTION 5: Emergency Contacts -->
                             <div class="form-section">
                                 <div class="form-section-header">
-                                    <h3>Emergency Contacts</h3>
+                                    <h3 data-i18n="sec_emergency">Emergency Contacts</h3>
                                 </div>
                                 <div id="emergency-contacts-list">
                                     <!-- Dynamic contact entries rendered by JS -->
                                 </div>
                                 <button type="button" class="add-item-button profile-add-btn"
-                                    id="add-emergency-contact-btn">
+                                    id="add-emergency-contact-btn" data-i18n="profile_add_contact">
                                     + Add Emergency Contact
                                 </button>
                             </div>
@@ -385,20 +412,21 @@
                             <!-- SECTION 6: Medical Information -->
                             <div class="form-section">
                                 <div class="form-section-header">
-                                    <h3>Medical Information</h3>
-                                    <span class="section-optional-badge">optional</span>
+                                    <h3 data-i18n="sec_medical">Medical Information</h3>
+                                    <span class="section-optional-badge" data-i18n="opt_tag">optional</span>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-medical">Medical Conditions</label>
-                                    <textarea id="profile-medical" rows="2"
+                                    <label for="profile-medical" data-i18n="lbl_medical">Medical Conditions</label>
+                                    <textarea id="profile-medical" rows="2" data-i18n-placeholder="ph_medical"
                                         placeholder="Any medical conditions, allergies, or medications…"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label>Doctors / Medical Providers</label>
+                                    <label data-i18n="lbl_doctors">Doctors / Medical Providers</label>
                                     <div id="doctors-list">
                                         <!-- Dynamic doctor entries rendered by JS -->
                                     </div>
-                                    <button type="button" class="add-item-button profile-add-btn" id="add-doctor-btn">
+                                    <button type="button" class="add-item-button profile-add-btn" id="add-doctor-btn"
+                                        data-i18n="profile_add_doctor">
                                         + Add Doctor
                                     </button>
                                 </div>
@@ -407,17 +435,17 @@
                             <!-- SECTION 7: Personal Details & Accessibility -->
                             <div class="form-section">
                                 <div class="form-section-header">
-                                    <h3>Personal Details</h3>
-                                    <span class="section-optional-badge">optional</span>
+                                    <h3 data-i18n="sec_personal">Personal Details</h3>
+                                    <span class="section-optional-badge" data-i18n="opt_tag">optional</span>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-hobbies">Hobbies &amp; Interests</label>
-                                    <textarea id="profile-hobbies" rows="2"
+                                    <label for="profile-hobbies" data-i18n="lbl_hobbies">Hobbies &amp; Interests</label>
+                                    <textarea id="profile-hobbies" rows="2" data-i18n-placeholder="ph_hobbies"
                                         placeholder="What do you enjoy doing? (e.g. Gardening, Chess)"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label for="profile-notes">Additional Notes</label>
-                                    <textarea id="profile-notes" rows="2"
+                                    <label for="profile-notes" data-i18n="lbl_add_notes">Additional Notes</label>
+                                    <textarea id="profile-notes" rows="2" data-i18n-placeholder="ph_add_notes"
                                         placeholder="Anything else you'd like Aegis to remember?"></textarea>
                                 </div>
                             </div>
@@ -425,25 +453,31 @@
                             <!-- SECTION 8: Emotional Anchors -->
                             <div class="form-section">
                                 <div class="form-section-header">
-                                    <h3>Emotional Anchors</h3>
-                                    <span class="section-optional-badge">optional</span>
+                                    <h3 data-i18n="sec_emotional">Emotional Anchors</h3>
+                                    <span class="section-optional-badge" data-i18n="opt_tag">optional</span>
                                 </div>
-                                <p class="section-desc">These help Aegis naturally reference the people and places that
+                                <p class="section-desc" data-i18n="emotional_desc">These help Aegis naturally reference
+                                    the people and places that
                                     matter most to you.</p>
                                 <div class="form-group">
-                                    <label for="profile-important-people">Important People</label>
+                                    <label for="profile-important-people" data-i18n="lbl_important_people">Important
+                                        People</label>
                                     <textarea id="profile-important-people" rows="2"
+                                        data-i18n-placeholder="ph_important_people"
                                         placeholder="e.g. My daughter Sarah, my friend Tom from church"></textarea>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="profile-music-era">Favourite Music Era</label>
-                                        <input type="text" id="profile-music-era"
+                                        <label for="profile-music-era" data-i18n="lbl_music_era">Favourite Music
+                                            Era</label>
+                                        <input type="text" id="profile-music-era" data-i18n-placeholder="ph_music_era"
                                             placeholder="e.g. 1960s Motown, Classical">
                                     </div>
                                     <div class="form-group">
-                                        <label for="profile-favourite-place">Favourite Place</label>
+                                        <label for="profile-favourite-place" data-i18n="lbl_fav_place">Favourite
+                                            Place</label>
                                         <input type="text" id="profile-favourite-place"
+                                            data-i18n-placeholder="ph_fav_place"
                                             placeholder="e.g. The cottage by the lake">
                                     </div>
                                 </div>
@@ -452,14 +486,16 @@
                             <!-- SECTION 9: Accessibility Enhancements -->
                             <div class="form-section">
                                 <div class="form-section-header">
-                                    <h3>Accessibility &amp; Display</h3>
-                                    <span class="section-optional-badge">optional</span>
+                                    <h3 data-i18n="sec_accessibility">Accessibility &amp; Display</h3>
+                                    <span class="section-optional-badge" data-i18n="opt_tag">optional</span>
                                 </div>
                                 <div class="toggle-row">
                                     <div class="toggle-item">
                                         <div class="toggle-label-group">
-                                            <span class="toggle-label">High Contrast Mode</span>
-                                            <span class="toggle-desc">Stronger colour contrast for easier reading</span>
+                                            <span class="toggle-label" data-i18n="toggle_high_contrast">High Contrast
+                                                Mode</span>
+                                            <span class="toggle-desc" data-i18n="toggle_high_contrast_desc">Stronger
+                                                colour contrast for easier reading</span>
                                         </div>
                                         <label class="switch">
                                             <input type="checkbox" id="profile-high-contrast">
@@ -468,9 +504,10 @@
                                     </div>
                                     <div class="toggle-item">
                                         <div class="toggle-label-group">
-                                            <span class="toggle-label">Reduced Animation</span>
-                                            <span class="toggle-desc">Calmer experience with fewer moving
-                                                elements</span>
+                                            <span class="toggle-label" data-i18n="toggle_reduced_motion">Reduced
+                                                Animation</span>
+                                            <span class="toggle-desc" data-i18n="toggle_reduced_motion_desc">Calmer
+                                                experience with fewer moving elements</span>
                                         </div>
                                         <label class="switch">
                                             <input type="checkbox" id="profile-reduced-motion">
@@ -479,8 +516,9 @@
                                     </div>
                                     <div class="toggle-item">
                                         <div class="toggle-label-group">
-                                            <span class="toggle-label">Text-to-Speech</span>
-                                            <span class="toggle-desc">Aegis reads responses aloud</span>
+                                            <span class="toggle-label" data-i18n="toggle_tts">Text-to-Speech</span>
+                                            <span class="toggle-desc" data-i18n="toggle_tts_desc">Aegis reads responses
+                                                aloud</span>
                                         </div>
                                         <label class="switch">
                                             <input type="checkbox" id="profile-tts">
@@ -490,19 +528,19 @@
                                 </div>
                                 <div class="form-row" style="margin-top: var(--spacing-lg);">
                                     <div class="form-group">
-                                        <label for="profile-voice-speed">Voice Speed</label>
+                                        <label for="profile-voice-speed" data-i18n="lbl_voice_speed">Voice Speed</label>
                                         <select id="profile-voice-speed">
-                                            <option value="normal">Normal</option>
-                                            <option value="slow">Slow</option>
-                                            <option value="fast">Fast</option>
+                                            <option value="normal" data-i18n="speed_normal">Normal</option>
+                                            <option value="slow" data-i18n="speed_slow">Slow</option>
+                                            <option value="fast" data-i18n="speed_fast">Fast</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="profile-font-size">Font Size</label>
+                                        <label for="profile-font-size" data-i18n="lbl_font_size">Font Size</label>
                                         <select id="profile-font-size">
-                                            <option value="normal">Normal</option>
-                                            <option value="big">Big</option>
-                                            <option value="small">Small</option>
+                                            <option value="normal" data-i18n="speed_normal">Normal</option>
+                                            <option value="big" data-i18n="size_big">Big</option>
+                                            <option value="small" data-i18n="size_small">Small</option>
                                         </select>
                                     </div>
                                 </div>
@@ -531,25 +569,23 @@
     <div id="routine-modal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h2 id="routine-modal-title">Add Routine</h2>
+                <h2 id="routine-modal-title" data-i18n="routine_modal_title_add">Add Routine</h2>
                 <button class="close-button" id="close-routine-modal">×</button>
             </div>
             <div class="modal-body">
                 <form id="routine-form">
                     <input type="hidden" id="routine-id">
-
                     <div class="form-group">
-                        <label for="routine-name">Routine Name *</label>
-                        <input type="text" id="routine-name" required placeholder="e.g. Take Medication">
+                        <label for="routine-name" data-i18n="routine_label_name">Routine Name</label>
+                        <input type="text" id="routine-name" required data-i18n-placeholder="routine_ph_name"
+                            placeholder="e.g. Take Medication">
                     </div>
-
                     <div class="form-group">
-                        <label for="routine-time">Time *</label>
+                        <label for="routine-time" data-i18n="routine_label_time">Time</label>
                         <input type="time" id="routine-time" required>
                     </div>
-
                     <div class="form-group">
-                        <label>Days of Week *</label>
+                        <label data-i18n="routine_label_days">Days of Week</label>
                         <div class="day-selector">
                             <button type="button" class="day-button" data-day="Mon">M</button>
                             <button type="button" class="day-button" data-day="Tue">T</button>
@@ -560,32 +596,30 @@
                             <button type="button" class="day-button" data-day="Sun">Su</button>
                         </div>
                     </div>
-
                     <div class="form-group">
-                        <label for="routine-description">Description</label>
-                        <textarea id="routine-description" rows="2" placeholder="Details..."></textarea>
+                        <label for="routine-description" data-i18n="routine_label_desc">Description</label>
+                        <textarea id="routine-description" rows="2" data-i18n-placeholder="routine_ph_desc"
+                            placeholder="Details..."></textarea>
                     </div>
-
                     <div class="form-group">
-                        <label for="routine-reminder">Reminder</label>
+                        <label for="routine-reminder" data-i18n="routine_label_reminder">Reminder</label>
                         <select id="routine-reminder">
-                            <option value="0">None</option>
-                            <option value="5">5 minutes before</option>
-                            <option value="10">10 minutes before</option>
-                            <option value="15">15 minutes before</option>
-                            <option value="30">30 minutes before</option>
-                            <option value="60">1 hour before</option>
+                            <option value="0" data-i18n="reminder_none">None</option>
+                            <option value="5" data-i18n="reminder_5">5 minutes before</option>
+                            <option value="10" data-i18n="reminder_10">10 minutes before</option>
+                            <option value="15" data-i18n="reminder_15">15 minutes before</option>
+                            <option value="30" data-i18n="reminder_30">30 minutes before</option>
+                            <option value="60" data-i18n="reminder_60">1 hour before</option>
                         </select>
                     </div>
-
                     <div class="form-group">
-                        <label for="routine-media">Media (Image/Video)</label>
+                        <label for="routine-media" data-i18n="routine_label_media">Media (Image/Video)</label>
                         <input type="file" id="routine-media" accept="image/*,video/*">
                     </div>
-
                     <div class="modal-actions">
-                        <button type="button" class="cancel-button" id="cancel-routine">Cancel</button>
-                        <button type="submit" class="save-button">Save Routine</button>
+                        <button type="button" class="cancel-button" id="cancel-routine"
+                            data-i18n="modal_cancel">Cancel</button>
+                        <button type="submit" class="save-button" data-i18n="routine_save">Save Routine</button>
                     </div>
                 </form>
             </div>
@@ -596,36 +630,34 @@
     <div id="memory-modal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h2 id="memory-modal-title">Add Memory</h2>
+                <h2 id="memory-modal-title" data-i18n="memory_modal_title_add">Add Memory</h2>
                 <button class="close-button" id="close-memory-modal">×</button>
             </div>
             <div class="modal-body">
                 <form id="memory-form">
                     <input type="hidden" id="memory-id">
-
                     <div class="form-group">
-                        <label for="memory-title">Title *</label>
-                        <input type="text" id="memory-title" required placeholder="e.g. Summer Vacation 2024">
+                        <label for="memory-title" data-i18n="memory_label_title">Title</label>
+                        <input type="text" id="memory-title" required data-i18n-placeholder="memory_ph_title"
+                            placeholder="e.g. Summer Vacation 2024">
                     </div>
-
                     <div class="form-group">
-                        <label for="memory-date">Date</label>
+                        <label for="memory-date" data-i18n="memory_label_date">Date</label>
                         <input type="date" id="memory-date">
                     </div>
-
                     <div class="form-group">
-                        <label for="memory-description">Description</label>
-                        <textarea id="memory-description" rows="3" placeholder="What happened?"></textarea>
+                        <label for="memory-description" data-i18n="memory_label_desc">Description</label>
+                        <textarea id="memory-description" rows="3" data-i18n-placeholder="memory_ph_desc"
+                            placeholder="What happened?"></textarea>
                     </div>
-
                     <div class="form-group">
-                        <label for="memory-media">Photo/Video</label>
+                        <label for="memory-media" data-i18n="memory_label_media">Photo/Video</label>
                         <input type="file" id="memory-media" accept="image/*,video/*">
                     </div>
-
                     <div class="modal-actions">
-                        <button type="button" class="cancel-button" id="cancel-memory">Cancel</button>
-                        <button type="submit" class="save-button">Save Memory</button>
+                        <button type="button" class="cancel-button" id="cancel-memory"
+                            data-i18n="modal_cancel">Cancel</button>
+                        <button type="submit" class="save-button" data-i18n="memory_save">Save Memory</button>
                     </div>
                 </form>
             </div>
@@ -636,72 +668,65 @@
     <div id="family-modal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h2 id="family-modal-title">Add Family Member</h2>
+                <h2 id="family-modal-title" data-i18n="family_modal_title_add">Add Family Member</h2>
                 <button class="close-button" id="close-family-modal">×</button>
             </div>
             <div class="modal-body">
                 <form id="family-form">
                     <input type="hidden" id="family-id">
-
                     <div class="form-section">
-                        <h3>Basic Information</h3>
+                        <h3 data-i18n="family_section_basic">Basic Information</h3>
                         <div class="form-group">
-                            <label for="family-name">Name *</label>
+                            <label for="family-name" data-i18n="family_label_name">Name</label>
                             <input type="text" id="family-name" required placeholder="E.g. Jane Doe">
                         </div>
-
                         <div class="form-group">
-                            <label for="family-relation">Relation *</label>
+                            <label for="family-relation" data-i18n="family_label_relation">Relation</label>
                             <input type="text" id="family-relation" required placeholder="E.g. Sister">
                         </div>
-
                         <div class="form-group">
-                            <label for="family-photo">Photo URL</label>
-                            <input type="text" id="family-photo" placeholder="Photo URL (optional)">
+                            <label for="family-photo" data-i18n="family_label_photo">Photo URL</label>
+                            <input type="text" id="family-photo" placeholder="Photo URL">
                         </div>
-
                         <div class="form-group">
-                            <label for="family-birthday">Birthday</label>
+                            <label for="family-birthday" data-i18n="family_label_birthday">Birthday</label>
                             <input type="date" id="family-birthday">
                         </div>
                     </div>
-
                     <div class="form-section">
-                        <h3>Contact Information</h3>
+                        <h3 data-i18n="family_section_contact">Contact Information</h3>
                         <div class="form-group">
-                            <label for="family-phone">Phone Number</label>
+                            <label for="family-phone" data-i18n="family_label_phone">Phone Number</label>
                             <input type="tel" id="family-phone" placeholder="Phone Number">
                         </div>
-
                         <div class="form-group">
-                            <label for="family-address">Address</label>
+                            <label for="family-address" data-i18n="family_label_address">Address</label>
                             <input type="text" id="family-address" placeholder="Address">
                         </div>
                     </div>
-
                     <div class="form-section">
-                        <h3>Additional Information</h3>
+                        <h3 data-i18n="family_section_extra">Additional Information</h3>
                         <div class="form-group">
-                            <label for="family-notes">Notes</label>
+                            <label for="family-notes" data-i18n="family_label_notes">Notes</label>
                             <textarea id="family-notes" rows="2" placeholder="Likes, dislikes, stories..."></textarea>
                         </div>
-
                         <div class="form-group">
-                            <label>Favorite Activities</label>
+                            <label data-i18n="family_label_activities">Favorite Activities</label>
                             <div id="family-activities-list"></div>
-                            <button type="button" class="add-item-button" id="add-activity">Add Activity</button>
+                            <button type="button" class="add-item-button" id="add-activity"
+                                data-i18n="family_add_activity">Add Activity</button>
                         </div>
-
                         <div class="form-group">
-                            <label>Important Dates</label>
+                            <label data-i18n="family_label_dates">Important Dates</label>
                             <div id="family-dates-list"></div>
-                            <button type="button" class="add-item-button" id="add-date">Add Date</button>
+                            <button type="button" class="add-item-button" id="add-date" data-i18n="family_add_date">Add
+                                Date</button>
                         </div>
                     </div>
-
                     <div class="modal-actions">
-                        <button type="button" class="cancel-button" id="cancel-family">Cancel</button>
-                        <button type="submit" class="save-button">Save Family Member</button>
+                        <button type="button" class="cancel-button" id="cancel-family"
+                            data-i18n="modal_cancel">Cancel</button>
+                        <button type="submit" class="save-button" data-i18n="family_save">Save Family Member</button>
                     </div>
                 </form>
             </div>
@@ -712,19 +737,22 @@
     <div id="memory-confirm-modal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h2>Memory Detected</h2>
-                <button class="close-button" onclick="closeMemoryConfirmModal()">&times;</button>
+                <h2 data-i18n="mem_confirm_title">Memory Detected</h2>
+                <button class="close-button" onclick="closeMemoryConfirmModal()">×</button>
             </div>
             <div class="modal-body">
-                <p>I noticed you just shared something meaningful. Would you like me to save this to your memories?</p>
+                <p data-i18n="mem_confirm_msg">I noticed you just shared something meaningful. Would you like me to save
+                    this to your memories?</p>
                 <div id="memory-confirm-content"
                     style="background: var(--color-gray-100); padding: var(--spacing-md); border-radius: var(--radius-md); margin: var(--spacing-md) 0;">
                     <!-- Memory preview will be here -->
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="cancel-button" onclick="closeMemoryConfirmModal()">Dismiss</button>
-                <button class="save-button" id="confirm-save-memory-btn">Save to Memories</button>
+                <button class="cancel-button" onclick="closeMemoryConfirmModal()"
+                    data-i18n="mem_confirm_dismiss">Dismiss</button>
+                <button class="save-button" id="confirm-save-memory-btn" data-i18n="mem_confirm_save">Save to
+                    Memories</button>
             </div>
         </div>
     </div>
@@ -733,26 +761,26 @@
     <div id="note-editor-modal" class="modal-overlay">
         <div class="modal modal-lg">
             <div class="modal-header">
-                <h2 id="note-editor-title">✏️ New Note</h2>
-                <button class="close-button" onclick="closeNoteEditor()">&times;</button>
+                <h2 id="note-editor-title" data-i18n="note_modal_title">✏️ New Note</h2>
+                <button class="close-button" onclick="closeNoteEditor()">×</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="note-editor-id">
                 <div class="form-group">
-                    <label for="note-editor-name">Title *</label>
-                    <input type="text" id="note-editor-name" placeholder="Give your note a title…" maxlength="100"
-                        required>
+                    <label for="note-editor-name" data-i18n="note_label_title">Title</label>
+                    <input type="text" id="note-editor-name" data-i18n-placeholder="note_ph_title"
+                        placeholder="Give your note a title…" maxlength="100" required>
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
-                    <label for="note-editor-body">Content <span
-                            style="color:var(--color-gray-400);font-size:0.8rem;">(optional)</span></label>
-                    <textarea id="note-editor-body" rows="9"
+                    <label for="note-editor-body" data-i18n="note_label_content">Content</label>
+                    <textarea id="note-editor-body" rows="9" data-i18n-placeholder="note_ph_content"
                         placeholder="Write anything here – a reminder, thought, or moment to remember…"></textarea>
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="cancel-button" onclick="closeNoteEditor()">Cancel</button>
-                <button class="save-button" id="note-editor-save-btn" onclick="saveNoteFromEditor()">Save Note</button>
+                <button class="cancel-button" onclick="closeNoteEditor()" data-i18n="modal_cancel">Cancel</button>
+                <button class="save-button" id="note-editor-save-btn" onclick="saveNoteFromEditor()"
+                    data-i18n="note_save">Save Note</button>
             </div>
         </div>
     </div>
@@ -761,26 +789,26 @@
     <div id="quick-note-modal" class="modal-overlay">
         <div class="modal modal-sm">
             <div class="modal-header">
-                <h2>✏️ New Note</h2>
-                <button class="close-button" onclick="closeQuickNoteModal()">&times;</button>
+                <h2 data-i18n="note_modal_title">✏️ New Note</h2>
+                <button class="close-button" onclick="closeQuickNoteModal()">×</button>
             </div>
             <div class="modal-body">
                 <form id="quick-note-form" onsubmit="saveQuickNote(event)">
                     <div class="form-group">
-                        <label for="qn-title">Title <span
-                                style="color:var(--color-gray-400);font-size:0.8rem;">(optional)</span></label>
-                        <input type="text" id="qn-title" placeholder="E.g. Doctor appointment reminder" maxlength="80">
+                        <label for="qn-title" data-i18n="note_label_title">Title</label>
+                        <input type="text" id="qn-title" data-i18n-placeholder="note_ph_quick_title"
+                            placeholder="E.g. Doctor appointment reminder" maxlength="80">
                     </div>
                     <div class="form-group">
-                        <label for="qn-content">Note *</label>
-                        <textarea id="qn-content" rows="5" placeholder="Want to remember something? Write it here…"
-                            required></textarea>
+                        <label for="qn-content" data-i18n="note_label_note">Note</label>
+                        <textarea id="qn-content" rows="5" data-i18n-placeholder="note_ph_quick_content"
+                            placeholder="Want to remember something? Write it here…" required></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-actions">
-                <button class="cancel-button" onclick="closeQuickNoteModal()">Cancel</button>
-                <button class="save-button" onclick="saveQuickNote()">Save Note</button>
+                <button class="cancel-button" onclick="closeQuickNoteModal()" data-i18n="modal_cancel">Cancel</button>
+                <button class="save-button" onclick="saveQuickNote()" data-i18n="note_save">Save Note</button>
             </div>
         </div>
     </div>
@@ -792,7 +820,7 @@
     <button id="floating-save-profile-btn" class="floating-save-btn"
         onclick="document.getElementById('profile-form').requestSubmit()" title="Save Profile">
         <span class="fsb-icon">💾</span>
-        <span class="fsb-label">Save Profile</span>
+        <span class="fsb-label" data-i18n="profile_save_label">Save Profile</span>
     </button>
 
     <!-- TOAST NOTIFICATION -->
@@ -802,20 +830,22 @@
     <div id="delete-entry-modal" class="modal-overlay">
         <div class="modal modal-sm">
             <div class="modal-header">
-                <h2>Confirm Deletion</h2>
-                <button class="close-button" onclick="cancelDeleteEntry()">&times;</button>
+                <h2 data-i18n="delete_modal_title">Confirm Deletion</h2>
+                <button class="close-button" onclick="cancelDeleteEntry()">×</button>
             </div>
             <div class="modal-body">
-                <p id="delete-entry-message">Are you sure you want to delete this?</p>
+                <p id="delete-entry-message" data-i18n="delete_modal_msg">Are you sure you want to delete this?</p>
             </div>
             <div class="modal-actions">
-                <button class="cancel-button" onclick="cancelDeleteEntry()">Cancel</button>
-                <button class="delete-confirm-button" id="confirm-delete-entry-btn">Confirm Delete</button>
+                <button class="cancel-button" onclick="cancelDeleteEntry()"
+                    data-i18n="delete_cancel_btn">Cancel</button>
+                <button class="delete-confirm-button" id="confirm-delete-entry-btn"
+                    data-i18n="delete_confirm_btn">Confirm Delete</button>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=3"></script>
 </body>
 
 </html>
