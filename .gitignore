@@ -12,6 +12,7 @@ build/
 # Environment variables — NEVER commit these
 .env
 .env.*
+Gemini_Key.txt
 
 # OS
 .DS_Store
