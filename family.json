@@ -1,19 +1,19 @@
 [
   {
+    "id": "e90a3a20-5dc9-4bbe-820c-f81d785494de",
+    "name": "John Green",
+    "relation": "Son",
+    "photo": "",
+    "birthday": "1990-02-03",
+    "phone": "555\u2011123\u20114567",
+    "address": "124 Maple Street, Springfield",
+    "notes": "Visits every Sunday",
     "activities": [
       "Gardening, Reading"
     ],
-    "address": "124 Maple Street, Springfield",
-    "birthday": "1990-02-03",
-    "id": "e90a3a20-5dc9-4bbe-820c-f81d785494de",
     "importantDates": [
       "2026-12-05"
-    ],
-    "name": "John Green",
-    "notes": "Visits every Sunday",
-    "phone": "555\u2011123\u20114567",
-    "photo": "/images/john.png",
-    "relation": "Son"
+    ]
   },
   {
     "activities": [],

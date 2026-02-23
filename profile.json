@@ -5,7 +5,7 @@
     "English",
     "French"
   ],
-  "app_language": "fr",
+  "app_language": "en",
   "cultural_bg": "",
   "memory_level": "mild",
   "comfort_topics": "Gardening, Baking, Classical Music",
@@ -57,6 +57,6 @@
   "preferences": {
     "voice_speed": "normal",
     "font_size": "normal",
-    "theme": "forest"
+    "theme": "ocean"
   }
 }

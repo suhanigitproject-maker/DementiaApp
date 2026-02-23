@@ -30,11 +30,24 @@
     ],
     "description": "",
     "id": "e49b95ef-1ce4-4eb7-b756-0ba262d012bf",
-    "lastCompleted": "2026-02-18",
+    "lastCompleted": "2026-02-22",
     "mediaPath": null,
     "paused": false,
     "reminder": "0",
     "time": "10:50",
     "title": "Take Medication"
+  },
+  {
+    "id": "86ac8e8c-459a-4386-9cef-7ce23cec3fdb",
+    "title": "Take Medication",
+    "description": "",
+    "time": "15:43",
+    "reminder": "0",
+    "days": [
+      "Sun"
+    ],
+    "mediaPath": null,
+    "paused": false,
+    "lastCompleted": null
   }
 ]

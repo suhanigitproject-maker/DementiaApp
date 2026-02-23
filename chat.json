@@ -304,5 +304,29 @@
         "timestamp": "2026-02-22T13:25:20.806133",
         "sender": "Aegis AI",
         "content": "Eleanor, I'm designed to be able to understand and communicate in many languages. While I can process and respond in French and Spanish, as we've just seen, my primary language for our conversations is English. My main goal is to make sure we can connect in a way that feels best for you, so please don't hesitate to use whichever language you feel most comfortable with."
+    },
+    {
+        "id": "f753d6c9-ffcb-48cd-b17c-d7f6bf8e322a",
+        "timestamp": "2026-02-22T17:12:36.440567",
+        "sender": "User",
+        "content": "hi"
+    },
+    {
+        "id": "38f5254a-f197-4b02-9eea-68c779344c40",
+        "timestamp": "2026-02-22T17:12:36.440586",
+        "sender": "Aegis AI",
+        "content": "Hello there, Eleanor! It's lovely to hear from you. How are you doing today?"
+    },
+    {
+        "id": "49e5b69a-1988-4c1d-bd4c-3106cd0cf6c8",
+        "timestamp": "2026-02-22T17:44:31.623680",
+        "sender": "User",
+        "content": "Who am I?"
+    },
+    {
+        "id": "4e3c4c41-4994-48b1-b2cf-fd0eb68ed79b",
+        "timestamp": "2026-02-22T17:44:31.623687",
+        "sender": "Aegis AI",
+        "content": "You are Eleanor Green, a wonderful woman of 78 years. You have a passion for gardening, baking, and classical music. You also enjoy your daily walks and take vitamin supplements. It's a pleasure to be here with you."
     }
 ]
