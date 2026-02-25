@@ -869,6 +869,6 @@ def uploaded_file(filename):
 
 if __name__ == '__main__':
     print("🚀 Starting Chat Server...")
-    print("📡 Server running on http://localhost:5001")
-    print("💬 Chat endpoint: http://localhost:5001/api/chat")
-    app.run(debug=True, port=5001, use_reloader=False)
+    print("📡 Server running on http://127.0.0.1:5001")
+    print("💬 Chat endpoint: http://127.0.0.1:5001/api/chat")
+    app.run(debug=True, host='127.0.0.1', port=5001, use_reloader=False)
