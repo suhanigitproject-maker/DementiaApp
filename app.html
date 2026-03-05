@@ -230,7 +230,7 @@
                     <div class="profile-container">
                         <h2 class="tab-title" style="margin-bottom: var(--spacing-xl);" data-i18n="profile_title">My
                             Profile</h2>
-                        <form id="profile-form">
+                        <form id="profile-form" novalidate>
 
                             <!-- SECTION 1: Identity & Context -->
                             <div class="form-section">
@@ -817,8 +817,7 @@
     <canvas id="theme-anim-canvas" class="theme-anim-canvas"></canvas>
 
     <!-- FLOATING SAVE PROFILE BUTTON -->
-    <button id="floating-save-profile-btn" class="floating-save-btn"
-        onclick="document.getElementById('profile-form').requestSubmit()" title="Save Profile">
+    <button id="floating-save-profile-btn" class="floating-save-btn" onclick="saveProfile()" title="Save Profile">
         <span class="fsb-icon">💾</span>
         <span class="fsb-label" data-i18n="profile_save_label">Save Profile</span>
     </button>

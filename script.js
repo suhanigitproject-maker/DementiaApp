@@ -2216,7 +2216,40 @@ function openQuickNoteModal(e) {
 function closeQuickNoteModal() { closeNoteEditor(); }
 async function saveQuickNote(e) {
     if (e) e.preventDefault();
-    await saveNoteFromEditor();
+
+    // The quick-note-modal has its own fields (qn-title, qn-content).
+    // Read from them directly and POST to the API.
+    const titleEl = document.getElementById('qn-title');
+    const contentEl = document.getElementById('qn-content');
+    const title = titleEl ? titleEl.value.trim() : '';
+    const content = contentEl ? contentEl.value.trim() : '';
+
+    if (!title) {
+        showToast('Please add a title before saving.', 'info');
+        if (titleEl) titleEl.focus();
+        return;
+    }
+
+    try {
+        const resp = await fetch('/api/notes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, content })
+        });
+        if (!resp.ok) throw new Error('Save failed');
+        const data = await resp.json();
+        notes.push(data.note);
+        // Clear fields and close modal
+        if (titleEl) titleEl.value = '';
+        if (contentEl) contentEl.value = '';
+        closeQuickNoteModal();
+        showToast(t('note_saved', currentAppLang), 'success');
+        renderNotesTab();
+        renderHomeNotes();
+    } catch (err) {
+        console.error('Error saving quick note:', err);
+        showToast('Could not save note. Please try again.', 'error');
+    }
 }
 
 function initNotes() {
