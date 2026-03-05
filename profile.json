@@ -1,17 +1,62 @@
 {
-  "preferred_name": "Suhani",
-  "name": "Suhani",
+  "preferred_name": "Eleanor",
+  "pronouns": "",
+  "languages_spoken": [
+    "English",
+    "French"
+  ],
+  "app_language": "en",
+  "cultural_bg": "",
   "memory_level": "mild",
-  "preferences": {
-    "theme": "default",
-    "font_size": "normal",
-    "voice_speed": "normal"
-  },
+  "comfort_topics": "",
+  "avoid_topics": "",
+  "triggers": "",
+  "day_type": "morning",
+  "reminder_style": "gentle",
+  "name": "Eleanor Green",
+  "age": "75",
+  "gender": "female",
+  "address": "124 Maple Street, Springfield, IL, USA",
+  "medical_conditions": "Mild memory difficulties, takes medication to help.",
+  "hobbies": "Baking, Gardening.",
+  "notes": "",
+  "important_people": "Son John green, neighbour Mary Lopez",
+  "music_era": "1960s and 1970s Classical Pop",
+  "favourite_place": "Lakeside Park",
+  "emergency_contacts": [
+    {
+      "name": "John Green",
+      "relation": "Son",
+      "phone": "555- 1900",
+      "address": "45 Oak Drive"
+    },
+    {
+      "name": "Maya Lopez",
+      "relation": "Neighbour",
+      "phone": "444- 1200",
+      "address": "44 Oak Drive"
+    }
+  ],
+  "doctors": [
+    {
+      "name": "Dr. Sarah Lee",
+      "specialty": "Cardiologist",
+      "phone": "555- 0200"
+    },
+    {
+      "name": "Dr. Smith Thorne",
+      "specialty": "Neurologist",
+      "phone": "444- 0100"
+    }
+  ],
   "accessibility": {
     "high_contrast": false,
     "reduced_motion": false,
     "tts": false
   },
-  "emergency_contacts": [],
-  "doctors": []
+  "preferences": {
+    "voice_speed": "normal",
+    "font_size": "normal",
+    "theme": "ocean"
+  }
 }
