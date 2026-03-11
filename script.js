@@ -2309,6 +2309,8 @@ class GeminiLiveSession {
         this.systemPrompt = systemPrompt;
         this.onStatus = onStatus || (() => { });
         this.onTranscript = onTranscript || (() => { });
+        this._aiTranscriptBuffer = '';  // accumulates streaming AI text per turn
+
         this.onStateChange = onStateChange || (() => { });
 
         this.ws = null;
@@ -2473,23 +2475,29 @@ class GeminiLiveSession {
                 }
             }
 
-            // Turn complete — play all queued audio then go back to listening
+            // Input transcript (what the user said) — arrives complete
+            if (sc.inputTranscription?.text) {
+                this.onTranscript('user', sc.inputTranscription.text);
+            }
+            // Output transcript — arrives as streaming chunks; buffer into one bubble
+            if (sc.outputTranscription?.text) {
+                this._aiTranscriptBuffer += sc.outputTranscription.text;
+                // Update the in-progress bubble in real-time
+                this.onTranscript('ai-chunk', this._aiTranscriptBuffer);
+            }
+
+            // Turn complete — finalise the AI bubble and reset buffer
             if (sc.turnComplete) {
+                if (this._aiTranscriptBuffer) {
+                    this.onTranscript('ai-done', this._aiTranscriptBuffer);
+                    this._aiTranscriptBuffer = '';
+                }
                 this._playQueued().then(() => {
                     if (this.isConnected) {
                         this.onStatus('Listening…');
                         this.onStateChange('listening');
                     }
                 });
-            }
-
-            // Input transcript (what the user said)
-            if (sc.inputTranscription?.text) {
-                this.onTranscript('user', sc.inputTranscription.text);
-            }
-            // Output transcript (what Aegis said)
-            if (sc.outputTranscription?.text) {
-                this.onTranscript('ai', sc.outputTranscription.text);
             }
         }
     }
@@ -2894,23 +2902,75 @@ function _clearTranscript() {
     if (inner) inner.innerHTML = '<p class="voice-transcript-hint">Your conversation will appear here…</p>';
 }
 
+// ── Transcript helpers for both modal + inline ──────────────────
+// Roles: 'user'     → new complete bubble
+//        'ai-chunk' → update last AI bubble in-place (streaming)
+//        'ai-done'  → finalise last AI bubble + mirror to chat
+
 function _appendTranscript(role, text) {
     const inner = document.getElementById('voice-transcript-inner');
     if (!inner) return;
 
-    // Remove the hint if still present
     const hint = inner.querySelector('.voice-transcript-hint');
     if (hint) hint.remove();
 
-    const line = document.createElement('p');
-    line.className = `voice-transcript-line ${role}`;
-    line.textContent = text;
-    inner.appendChild(line);
+    if (role === 'user') {
+        const line = document.createElement('p');
+        line.className = 'voice-transcript-line user';
+        line.textContent = text;
+        inner.appendChild(line);
+    } else if (role === 'ai-chunk') {
+        // Update the last AI bubble, or create one
+        let last = inner.querySelector('.voice-transcript-line.ai.streaming');
+        if (!last) {
+            last = document.createElement('p');
+            last.className = 'voice-transcript-line ai streaming';
+            inner.appendChild(last);
+        }
+        last.textContent = text;
+    } else if (role === 'ai-done') {
+        // Finalise the streaming bubble
+        const last = inner.querySelector('.voice-transcript-line.ai.streaming');
+        if (last) {
+            last.classList.remove('streaming');
+            last.textContent = text;
+        }
+        // Mirror complete message to main chat
+        if (text && text.trim()) addChatMessage(text, 'ai');
+    }
 
-    // Auto-scroll
     const container = document.getElementById('voice-transcript');
     if (container) container.scrollTop = container.scrollHeight;
+}
 
-    // Also add to the main chat view so the conversation is preserved
-    addChatMessage(text, role === 'user' ? 'user' : 'ai');
+function _appendInlineTranscript(role, text) {
+    if (role === 'ai-chunk' && (!text || !text.trim())) return;
+    const box = document.getElementById('inline-transcript');
+    if (!box) return;
+
+    const hint = document.getElementById('inline-transcript-hint');
+    if (hint) hint.remove();
+
+    if (role === 'user') {
+        const line = document.createElement('div');
+        line.className = 'vil-line user';
+        line.textContent = text;
+        box.appendChild(line);
+    } else if (role === 'ai-chunk') {
+        let last = box.querySelector('.vil-line.ai.streaming');
+        if (!last) {
+            last = document.createElement('div');
+            last.className = 'vil-line ai streaming';
+            box.appendChild(last);
+        }
+        last.textContent = text;
+    } else if (role === 'ai-done') {
+        const last = box.querySelector('.vil-line.ai.streaming');
+        if (last) {
+            last.classList.remove('streaming');
+            last.textContent = text;
+        }
+    }
+
+    box.scrollTop = box.scrollHeight;
 }

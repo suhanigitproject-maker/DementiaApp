@@ -2848,7 +2848,9 @@ html[dir="rtl"] .profile-entry-header {
 
 .voice-end-btn:active {
     transform: scale(0.97);
-}/* ===================================
+}
+
+/* ===================================
    INLINE VOICE CHAT MODE
    Embedded in the chat tab (not a modal)
    =================================== */
@@ -2909,11 +2911,13 @@ html[dir="rtl"] .profile-entry-header {
     background: linear-gradient(145deg, #1a3a5c 0%, #0f2744 100%);
     border: 2px solid var(--theme-mic-border, rgba(56, 189, 248, 0.35));
     color: var(--theme-secondary, #38bdf8);
+    /* stack icon + label vertically, perfectly centred */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.3rem;
+    gap: 6px;
+    padding: 0;
     cursor: pointer;
     flex-shrink: 0;
     z-index: 1;
@@ -2923,6 +2927,28 @@ html[dir="rtl"] .profile-entry-header {
         background 0.3s ease, transform 0.15s ease;
     -webkit-tap-highlight-color: transparent;
 }
+
+/* SVG icons — always block, centred */
+.voice-inline-mic svg {
+    display: block;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+/* mic-off hidden by default */
+.voice-inline-mic .mic-off {
+    display: none;
+}
+
+/* muted: swap icons */
+.voice-inline-mic.muted .mic-on {
+    display: none !important;
+}
+
+.voice-inline-mic.muted .mic-off {
+    display: block !important;
+}
+
 
 /* Outer glow ring */
 .voice-inline-mic .mic-glow-ring {
@@ -2978,17 +3004,6 @@ html[dir="rtl"] .profile-entry-header {
         0 8px 28px rgba(239, 68, 68, 0.2);
 }
 
-.voice-inline-mic.muted .mic-on {
-    display: none !important;
-}
-
-.voice-inline-mic.muted .mic-off {
-    display: block !important;
-}
-
-.voice-inline-mic .mic-off {
-    display: none;
-}
 
 .voice-inline-status {
     font-size: 0.7rem;
@@ -3079,53 +3094,101 @@ html[dir="rtl"] .profile-entry-header {
 /* Inline transcript */
 .voice-inline-transcript {
     width: 100%;
-    max-height: 130px;
+    max-height: 160px;
     overflow-y: auto;
-    background: rgba(14, 35, 64, 0.55);
-    border: 1px solid rgba(56, 189, 248, 0.1);
-    border-radius: 12px;
-    padding: 0.8rem 1rem;
+    background: rgba(8, 22, 46, 0.65);
+    border: 1px solid rgba(56, 189, 248, 0.12);
+    border-radius: 14px;
+    padding: 0.9rem 1rem;
     z-index: 1;
 }
 
-.voice-inline-transcript p {
-    font-size: 0.85rem;
-    color: rgba(147, 210, 240, 0.5);
+/* Hint text */
+.voice-inline-transcript>p {
+    font-size: 0.88rem;
+    color: rgba(147, 210, 240, 0.4);
     text-align: center;
     font-style: italic;
     margin: 0;
+    padding: 0.5rem 0;
 }
 
+/* Conversation bubble */
 .voice-inline-transcript .vil-line {
-    font-size: 0.85rem;
-    line-height: 1.5;
-    padding: 0.3rem 0.65rem;
-    border-radius: 8px;
-    margin-bottom: 0.3rem;
+    font-size: 1rem;
+    /* larger for readability */
+    line-height: 1.55;
+    padding: 0.55rem 0.85rem;
+    border-radius: 10px;
+    margin-bottom: 0.45rem;
+    max-width: 92%;
 }
 
+/* User bubble — right-aligned */
 .voice-inline-transcript .vil-line.user {
-    background: rgba(56, 189, 248, 0.1);
-    color: #bae6fd;
+    background: rgba(56, 189, 248, 0.12);
+    color: #e0f2fe;
     text-align: right;
+    margin-left: auto;
 }
 
 .voice-inline-transcript .vil-line.user::before {
-    content: "You: ";
-    font-weight: 600;
-    color: #7dd3fc;
+    content: "You  ";
+    font-weight: 700;
+    color: var(--theme-secondary, #7dd3fc);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 2px;
 }
 
+/* AI bubble — left-aligned */
 .voice-inline-transcript .vil-line.ai {
-    background: rgba(20, 184, 166, 0.1);
-    color: #99f6e4;
+    background: rgba(20, 184, 166, 0.12);
+    color: #f0fdf4;
+    text-align: left;
+    margin-right: auto;
+    font-size: 1.05rem;
+    /* slightly bigger for AI — most important text */
+    font-weight: 400;
 }
 
 .voice-inline-transcript .vil-line.ai::before {
-    content: "Aegis: ";
-    font-weight: 600;
-    color: #5eead4;
+    content: "Aegis  ";
+    font-weight: 700;
+    color: var(--theme-primary, #5eead4);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 2px;
 }
+
+/* Streaming bubble: subtle left-border pulse while Aegis is still talking */
+.voice-inline-transcript .vil-line.ai.streaming {
+    border-left: 3px solid var(--theme-primary, #14b8a6);
+    padding-left: calc(0.85rem - 3px);
+    animation: streamingPulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes streamingPulse {
+    from {
+        border-left-color: var(--theme-primary, #14b8a6);
+    }
+
+    to {
+        border-left-color: transparent;
+    }
+}
+
+/* Modal transcript — same streaming treatment */
+.voice-transcript-inner .voice-transcript-line.ai.streaming {
+    border-left: 3px solid var(--theme-primary, #14b8a6);
+    padding-left: calc(0.8rem - 3px);
+    animation: streamingPulse 1.4s ease-in-out infinite alternate;
+}
+
 
 /* Mode toggle button */
 .chat-mode-toggle {
