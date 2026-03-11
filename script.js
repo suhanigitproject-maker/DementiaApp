@@ -649,6 +649,7 @@ async function loadRoutines() {
 
 function renderRoutines() {
     const list = document.getElementById('routines-list');
+    if (!list) return;   // guard: element not yet in DOM
     list.innerHTML = '';
 
     let filteredRoutines = routines;
@@ -658,7 +659,9 @@ function renderRoutines() {
         filteredRoutines = routines.filter(r => r.days && r.days.includes(today));
     }
 
-    filteredRoutines.sort((a, b) => a.time.localeCompare(b.time));
+    // Safe sort — treat missing time as '00:00'
+    filteredRoutines.sort((a, b) => (a.time || '00:00').localeCompare(b.time || '00:00'));
+
 
     if (filteredRoutines.length === 0) {
         list.innerHTML = `<div class="empty-state">${t(currentRoutineView === 'today' ? 'routines_empty_today' : 'routines_empty_all', currentAppLang)}</div>`;
@@ -1383,24 +1386,19 @@ function initChat() {
     const input = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-button');
     const clearBtn = document.getElementById('clear-chat-btn');
-    const saveBtn = document.getElementById('save-chat-btn');
+    // save-chat-btn was removed from HTML in the voice-first redesign — safe to skip
 
-    if (sendBtn) {
-        sendBtn.addEventListener('click', sendMessage);
-    }
+    if (sendBtn) sendBtn.addEventListener('click', sendMessage);
 
     if (input) {
         input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+            if (e.key === 'Enter') sendMessage();
         });
     }
 
-    if (clearBtn) {
-        clearBtn.addEventListener('click', clearChat);
-    }
+    if (clearBtn) clearBtn.addEventListener('click', clearChat);
 }
+
 
 async function clearChat() {
     if (confirm('Are you sure you want to clear the conversation history?')) {
@@ -1409,6 +1407,8 @@ async function clearChat() {
             chatMessages.innerHTML = '';
             addChatMessage('History cleared.', 'ai');
         }
+        // Also clear the inline voice transcript
+        _clearInlineTranscript();
     }
 }
 
@@ -1517,6 +1517,8 @@ async function sendMessage() {
 
 function addChatMessage(text, sender) {
     const messagesContainer = document.getElementById('chat-messages');
+    if (!messagesContainer) return;   // voice mode — chat-messages may not be visible
+
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}-message`;
 
@@ -1536,7 +1538,6 @@ function addChatMessage(text, sender) {
 
     content.appendChild(messageText);
     content.appendChild(time);
-
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(content);
 
@@ -1550,6 +1551,8 @@ function addChatMessage(text, sender) {
  */
 function addMemorySurfacedIndicator(memoryTitle, surfacingMode) {
     const messagesContainer = document.getElementById('chat-messages');
+    if (!messagesContainer) return;   // voice mode — skip silently
+
     const modeIcon = { echo: '💭', soft_reminder: '🔔', invitation: '✨' }[surfacingMode] || '📌';
     const modeLabel = {
         echo: 'echoing a theme',
@@ -1575,6 +1578,7 @@ function addMemorySurfacedIndicator(memoryTitle, surfacingMode) {
 }
 
 // Memory Confirmation Logic
+
 let pendingMemory = null;
 let lastChatMessageId = null; // Tracks the ID of the most recent user chat message
 
