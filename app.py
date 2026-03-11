@@ -871,32 +871,142 @@ def uploaded_file(filename):
 def live_config():
     """
     Return the Gemini Live API config for the frontend WebSocket connection.
-    Keeping the key server-side and serving it fresh prevents it from being
-    hardcoded in static JS while still allowing browser-direct WebSocket usage.
+    Uses the same context-building logic as /api/chat so the voice companion
+    has identical knowledge, personality, and language settings.
     """
-    profile = load_profile()
+    # ── Load all personal data (same as /api/chat) ──────────────────
+    profile  = load_profile()
+    routines = load_routines()
+    memories = load_memories()
+    family   = load_family()
+    past_chat = load_chat_history_data()
+
+    # ── Identity ─────────────────────────────────────────────────────
     name = profile.get('preferred_name') or profile.get('name') or 'friend'
-    language = profile.get('app_language', 'en')
+
+    # ── Language settings (mirrors /api/chat exactly) ─────────────────
+    app_language     = profile.get('app_language', 'en')
+    languages_spoken = profile.get('languages_spoken', [])
+    if isinstance(languages_spoken, str):
+        languages_spoken = [l.strip() for l in languages_spoken.split(',') if l.strip()]
+
     LANG_NAMES = {
         'en': 'English', 'fr': 'French', 'es': 'Spanish', 'de': 'German',
         'it': 'Italian', 'pt': 'Portuguese', 'hi': 'Hindi', 'ar': 'Arabic',
         'zh': 'Mandarin Chinese', 'ja': 'Japanese', 'ko': 'Korean', 'pa': 'Punjabi',
     }
-    lang_name = LANG_NAMES.get(language, 'English')
-    voice_system_prompt = (
-        f"You are Aegis, a warm, calm, and compassionate AI voice companion designed to support "
-        f"elderly people through supportive conversation. You are speaking with {name}. "
-        f"Keep your responses brief (1-3 sentences), warm, and easy to understand. "
-        f"Speak slowly and clearly. Always respond in {lang_name}. "
-        f"You are here to listen, comfort, and engage in friendly conversation. "
-        f"Ask gentle follow-up questions to keep the conversation going. "
-        f"Avoid complex topics unless the user brings them up. Be patient and kind."
-    )
+    primary_lang  = LANG_NAMES.get(app_language, app_language)
+    spoken_list   = ', '.join(languages_spoken) if languages_spoken else primary_lang
+
+    # ── Personal context (same sections as /api/chat) ─────────────────
+    context_parts = []
+
+    # 1. Profile
+    profile_text = "USER PROFILE:\n"
+    if profile.get('name'):               profile_text += f"- Name: {profile['name']}\n"
+    if profile.get('preferred_name'):     profile_text += f"- Preferred Name: {profile['preferred_name']}\n"
+    if profile.get('age'):                profile_text += f"- Age: {profile['age']}\n"
+    if profile.get('gender'):             profile_text += f"- Gender: {profile['gender']}\n"
+    if profile.get('medical_conditions'): profile_text += f"- Medical Context: {profile['medical_conditions']}\n"
+    if profile.get('hobbies'):            profile_text += f"- Interests & Hobbies: {profile['hobbies']}\n"
+    if profile.get('comfort_topics'):     profile_text += f"- Comfortable Topics: {profile['comfort_topics']}\n"
+    if profile.get('avoid_topics'):       profile_text += f"- Topics to Avoid: {profile['avoid_topics']}\n"
+    if profile.get('memory_level'):       profile_text += f"- Memory Support Level: {profile['memory_level']}\n"
+    if profile.get('notes'):              profile_text += f"- Additional Notes: {profile['notes']}\n"
+    context_parts.append(profile_text)
+
+    # 2. Routines
+    if routines:
+        routine_text = "CURRENT ROUTINES:\n"
+        for r in routines:
+            routine_text += f"- {r.get('title')} at {r.get('time')} ({r.get('days')})\n"
+        context_parts.append(routine_text)
+
+    # 3. Stored memories
+    if memories.get('memories'):
+        memory_text = "STORED MEMORIES:\n"
+        for m in memories['memories']:
+            memory_text += f"- {m.get('title')}: {m.get('description')}\n"
+        context_parts.append(memory_text)
+
+    # 4. Family & contacts
+    if family:
+        family_text = "FAMILY & CONTACTS:\n"
+        for f in family:
+            family_text += f"- {f.get('name')} ({f.get('relation')})"
+            if f.get('birthday'): family_text += f" - Birthday: {f.get('birthday')}"
+            family_text += "\n"
+        context_parts.append(family_text)
+
+    # 5. Recent chat history (last 10 messages for brevity, same as /api/chat)
+    if past_chat:
+        chat_text = "PAST CONVERSATIONS (RECAP):\n"
+        for msg in past_chat[-10:]:
+            chat_text += f"[{msg.get('timestamp')}] {msg.get('sender')}: {msg.get('content')}\n"
+        context_parts.append(chat_text)
+
+    full_context = "\n\n".join(context_parts)
+
+    # ── Build the voice system prompt ─────────────────────────────────
+    # Same core personality and rules as SYSTEM_PROMPT, adapted for voice:
+    #  • No JSON output required (Live API is a spoken conversation)
+    #  • Responses kept short and natural for speech
+    #  • All memory/context/language rules preserved
+    voice_system_prompt = f"""You are Aegis, a compassionate, patient AI memory companion designed to support elderly people through warm, respectful voice conversation. You are speaking directly with {name}.
+
+CORE ROLE
+- Have calm, empathetic, human-like conversations
+- Encourage storytelling without pressure or correction
+- Resurface memories naturally when contextually relevant
+- Keep spoken responses brief (2-4 sentences) and easy to understand
+- Speak warmly but clearly — this is a live voice call
+
+LANGUAGE SETTINGS
+- Primary language: {primary_lang} — always respond in {primary_lang} by default
+- Languages {name} also speaks: {spoken_list}
+- If {name} speaks in one of those languages, switch smoothly without comment
+- Do NOT explain the language switch; just continue naturally
+
+PERSONAL DATA
+You have access to {name}'s personal context loaded below. Use it proactively and naturally:
+- Reference their name, hobbies, and interests naturally
+- Gently weave in stored memories when the topic aligns
+- Be aware of topics to avoid and comfort topics from their profile
+- Reference family members by name when relevant
+
+BEHAVIOR RULES
+1. Use the stored personal data before generating responses — never guess or fabricate
+2. Memories and routines are companions in conversation, not interruptions
+3. Resurface a stored memory only when topic, emotion, or context aligns — use its exact title
+4. NEVER surface the same memory twice in a row
+5. NEVER surface memories after confusion or emotionally heavy moments
+6. Do not expose raw data structures — only warm, natural spoken language
+7. Do not diagnose, recommend treatments, or provide medical advice
+8. Preserve dignity, autonomy, and emotional safety at all times
+
+MEMORY RESURFACING (voice-adapted)
+When a stored memory fits the conversation, reference it naturally:
+- "That reminds me of something you shared — your memory called '[title]'. Is this the same kind of thing?"
+- "I remember you mentioned [brief detail]. Does that connect to what you're telling me now?"
+- "You've kept a memory of that. It sounds like it still means a great deal to you."
+
+CONVERSATION STYLE
+- Warm, slow-paced, reassuring tone
+- Simple, clear spoken language — avoid complex sentences
+- Gentle curiosity, never interrogation
+- Ask one follow-up question at a time
+- If {name} seems confused or distressed, acknowledge feelings first before anything else
+
+CURRENT DATE/TIME: {datetime.now().strftime("%A, %B %d, %Y at %I:%M %p")}
+
+{full_context}"""
+
     return jsonify({
-        'apiKey': GEMINI_API_KEY,
+        'apiKey':       GEMINI_API_KEY,
         'systemPrompt': voice_system_prompt,
-        'userName': name
+        'userName':     name
     })
+
 
 if __name__ == '__main__':
     print("🚀 Starting Chat Server...")
