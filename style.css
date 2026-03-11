@@ -2777,43 +2777,268 @@ html[dir="rtl"] .profile-entry-header {
     color: #5eead4;
 }
 
-/* ── Controls ── */
-.voice-call-controls {
-    display: flex;
-    align-items: center;
-    gap: 1.8rem;
-}
-
-.voice-mute-btn {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1.5px solid rgba(255, 255, 255, 0.2);
-    color: #e0f2fe;
+/* ── Center section: waveforms + central mic ── */
+.voice-center-section {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 1.4rem;
+    width: 100%;
+    padding: 0.5rem 0;
+}
+
+/* Side waveforms flanking the mic button */
+.voice-waveform-left,
+.voice-waveform-right {
+    flex-direction: column;
+    gap: 6px;
+    height: auto;
+    width: 10px;
+}
+
+.voice-waveform-left {
+    align-items: flex-end;
+}
+
+.voice-waveform-right {
+    align-items: flex-start;
+}
+
+.voice-waveform-left .wf-bar,
+.voice-waveform-right .wf-bar {
+    width: 6px;
+    height: 10px;
+    border-radius: 3px;
+}
+
+/* Animate side bars when listening */
+.voice-waveform-left.listening .wf-bar,
+.voice-waveform-right.listening .wf-bar {
+    opacity: 1;
+    animation: wfSideListening 1.2s ease-in-out infinite alternate;
+}
+
+.voice-waveform-left.speaking .wf-bar,
+.voice-waveform-right.speaking .wf-bar {
+    opacity: 1;
+    animation: wfSideSpeaking 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes wfSideListening {
+    from {
+        height: 6px;
+    }
+
+    to {
+        height: 30px;
+    }
+}
+
+@keyframes wfSideSpeaking {
+    from {
+        height: 14px;
+    }
+
+    to {
+        height: 40px;
+    }
+}
+
+/* Staggered delays for side bars */
+.voice-waveform-left .wf-bar:nth-child(1) {
+    animation-delay: 0.00s;
+}
+
+.voice-waveform-left .wf-bar:nth-child(2) {
+    animation-delay: 0.10s;
+}
+
+.voice-waveform-left .wf-bar:nth-child(3) {
+    animation-delay: 0.20s;
+}
+
+.voice-waveform-left .wf-bar:nth-child(4) {
+    animation-delay: 0.30s;
+}
+
+.voice-waveform-left .wf-bar:nth-child(5) {
+    animation-delay: 0.20s;
+}
+
+.voice-waveform-left .wf-bar:nth-child(6) {
+    animation-delay: 0.10s;
+}
+
+.voice-waveform-left .wf-bar:nth-child(7) {
+    animation-delay: 0.00s;
+}
+
+.voice-waveform-right .wf-bar:nth-child(1) {
+    animation-delay: 0.00s;
+}
+
+.voice-waveform-right .wf-bar:nth-child(2) {
+    animation-delay: 0.10s;
+}
+
+.voice-waveform-right .wf-bar:nth-child(3) {
+    animation-delay: 0.20s;
+}
+
+.voice-waveform-right .wf-bar:nth-child(4) {
+    animation-delay: 0.30s;
+}
+
+.voice-waveform-right .wf-bar:nth-child(5) {
+    animation-delay: 0.20s;
+}
+
+.voice-waveform-right .wf-bar:nth-child(6) {
+    animation-delay: 0.10s;
+}
+
+.voice-waveform-right .wf-bar:nth-child(7) {
+    animation-delay: 0.00s;
+}
+
+/* ── Large central mic button ── */
+.voice-mic-center {
+    position: relative;
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--color-teal, #14b8a6) 0%, var(--color-sky, #38bdf8) 100%);
+    border: none;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
+    box-shadow:
+        0 0 0 0 rgba(20, 184, 166, 0.5),
+        0 8px 32px rgba(20, 184, 166, 0.4);
+    flex-shrink: 0;
+    z-index: 1;
 }
 
-.voice-mute-btn:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.4);
+/* Pulsing glow ring while listening */
+.voice-mic-center .voice-mic-glow {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 2px solid rgba(20, 184, 166, 0.4);
+    animation: micGlowPulse 2s ease-out infinite;
+    pointer-events: none;
 }
 
-.voice-mute-btn.muted {
-    background: rgba(239, 68, 68, 0.2);
-    border-color: rgba(239, 68, 68, 0.5);
-    color: #fca5a5;
+@keyframes micGlowPulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+
+    60% {
+        transform: scale(1.25);
+        opacity: 0.15;
+    }
+
+    100% {
+        transform: scale(1.35);
+        opacity: 0;
+    }
+}
+
+/* Hover */
+.voice-mic-center:hover {
+    transform: scale(1.06);
+    box-shadow:
+        0 0 0 0 rgba(20, 184, 166, 0.5),
+        0 12px 40px rgba(20, 184, 166, 0.55);
+}
+
+.voice-mic-center:active {
+    transform: scale(0.95);
+}
+
+/* Mic label beneath the icon */
+.voice-mic-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+    margin-top: 2px;
+    pointer-events: none;
+}
+
+/* Muted state — red */
+.voice-mic-center.muted {
+    background: linear-gradient(145deg, #ef4444 0%, #dc2626 100%);
+    box-shadow:
+        0 0 0 0 rgba(239, 68, 68, 0.5),
+        0 8px 32px rgba(239, 68, 68, 0.4);
+}
+
+.voice-mic-center.muted .voice-mic-glow {
+    border-color: rgba(239, 68, 68, 0.4);
+    animation: micGlowPulseMuted 2s ease-out infinite;
+}
+
+@keyframes micGlowPulseMuted {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+
+    60% {
+        transform: scale(1.2);
+        opacity: 0.12;
+    }
+
+    100% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+}
+
+/* AI speaking state — blue, dims the mic slightly */
+.voice-mic-center.ai-speaking {
+    background: linear-gradient(145deg, #0ea5e9 0%, #2563eb 100%);
+    box-shadow:
+        0 0 0 0 rgba(56, 189, 248, 0.6),
+        0 8px 40px rgba(56, 189, 248, 0.5);
+    opacity: 0.85;
+}
+
+.voice-mic-center.ai-speaking .voice-mic-glow {
+    border-color: rgba(56, 189, 248, 0.5);
+}
+
+/* Icon swap */
+.voice-mic-center.muted .mic-on {
+    display: none !important;
+}
+
+.voice-mic-center.muted .mic-off {
+    display: block !important;
+}
+
+/* ── Bottom controls (end call only) ── */
+.voice-call-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.8rem;
 }
 
 .voice-end-btn {
     display: flex;
     align-items: center;
     gap: 0.55rem;
-    padding: 0.75rem 2rem;
+    padding: 0.75rem 2.4rem;
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: #fff;
     border: none;

@@ -856,7 +856,8 @@
     <div id="voice-call-modal" class="voice-call-overlay" aria-modal="true" role="dialog"
         aria-label="Voice conversation with Aegis">
         <div class="voice-call-container">
-            <!-- Header -->
+
+            <!-- Top: Name + Status -->
             <div class="voice-call-header">
                 <div class="voice-call-avatar-wrap">
                     <div class="voice-call-avatar" id="voice-avatar">🤖</div>
@@ -870,13 +871,40 @@
                 <p class="voice-call-status" id="voice-status">Connecting…</p>
             </div>
 
-            <!-- Waveform visualizer -->
-            <div class="voice-waveform" id="voice-waveform" aria-hidden="true">
-                <span class="wf-bar"></span><span class="wf-bar"></span><span class="wf-bar"></span>
-                <span class="wf-bar"></span><span class="wf-bar"></span><span class="wf-bar"></span>
-                <span class="wf-bar"></span><span class="wf-bar"></span><span class="wf-bar"></span>
-                <span class="wf-bar"></span><span class="wf-bar"></span><span class="wf-bar"></span>
-                <span class="wf-bar"></span><span class="wf-bar"></span><span class="wf-bar"></span>
+            <!-- Center: Waveform bars + large mic button -->
+            <div class="voice-center-section">
+                <!-- Waveform on the left side -->
+                <div class="voice-waveform voice-waveform-left" id="voice-waveform-left" aria-hidden="true">
+                    <span class="wf-bar"></span><span class="wf-bar"></span><span class="wf-bar"></span>
+                    <span class="wf-bar"></span><span class="wf-bar"></span><span class="wf-bar"></span>
+                    <span class="wf-bar"></span>
+                </div>
+
+                <!-- Central mic button — tap to mute/unmute -->
+                <button class="voice-mic-center" id="voice-mute-btn" title="Tap to mute / unmute"
+                    aria-label="Microphone — tap to mute">
+                    <div class="voice-mic-glow"></div>
+                    <!-- Mic icon -->
+                    <svg class="mic-icon mic-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                        fill="currentColor" width="36" height="36">
+                        <path
+                            d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm-1.5 13.9A7.002 7.002 0 0 1 5 8H3a9.001 9.001 0 0 0 7.5 8.9V20H8v2h8v-2h-2.5v-3.1A9.001 9.001 0 0 0 21 8h-2a7.002 7.002 0 0 1-5.5 6.9z" />
+                    </svg>
+                    <!-- Muted icon (mic with slash) -->
+                    <svg class="mic-icon mic-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                        fill="currentColor" width="36" height="36" style="display:none">
+                        <path
+                            d="M19 11a7 7 0 0 1-.17 1.45l-1.5-1.5A5 5 0 0 0 17 11V5a5 5 0 0 0-10 0v.17L5.27 3.44A7 7 0 0 1 19 5v6zm-7 8a7.002 7.002 0 0 1-6.33-4l-1.46-1.46A9.001 9.001 0 0 0 11 18.94V21H8v2h8v-2h-3v-2.06A9 9 0 0 0 21 11h-2a7 7 0 0 1-7 7zM3.27 2 2 3.27l3.25 3.25A6.97 6.97 0 0 0 5 8v3a7 7 0 0 0 11.2 5.6l1.53 1.53A9 9 0 0 1 3 11V8c0-1.02.17-2 .48-2.91L2 3.27z" />
+                    </svg>
+                    <span class="voice-mic-label" id="voice-mic-label">Tap to mute</span>
+                </button>
+
+                <!-- Waveform on the right side -->
+                <div class="voice-waveform voice-waveform-right" id="voice-waveform" aria-hidden="true">
+                    <span class="wf-bar"></span><span class="wf-bar"></span><span class="wf-bar"></span>
+                    <span class="wf-bar"></span><span class="wf-bar"></span><span class="wf-bar"></span>
+                    <span class="wf-bar"></span>
+                </div>
             </div>
 
             <!-- Live transcript -->
@@ -886,15 +914,8 @@
                 </div>
             </div>
 
-            <!-- Controls -->
+            <!-- Bottom: End Call only -->
             <div class="voice-call-controls">
-                <button class="voice-mute-btn" id="voice-mute-btn" title="Mute microphone" aria-label="Mute microphone">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22"
-                        height="22">
-                        <path
-                            d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm-1.5 13.9A7.002 7.002 0 0 1 5 8H3a9.001 9.001 0 0 0 7.5 8.9V20H8v2h8v-2h-2.5v-3.1A9.001 9.001 0 0 0 21 8h-2a7.002 7.002 0 0 1-5.5 6.9z" />
-                    </svg>
-                </button>
                 <button class="voice-end-btn" id="voice-end-btn" aria-label="End call">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="26"
                         height="26">
@@ -906,6 +927,7 @@
             </div>
         </div>
     </div>
+
 
     <script src="script.js?v=3"></script>
 

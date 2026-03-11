@@ -2656,11 +2656,13 @@ async function openVoiceCall() {
         onStatus: _setVoiceStatus,
         onTranscript: _appendTranscript,
         onStateChange: (state) => {
-            if (state === 'listening') _setVoiceWaveform('listening');
-            else if (state === 'speaking') _setVoiceWaveform('speaking');
-            else _setVoiceWaveform('idle');
-
-            // Avatar glow
+            _setVoiceWaveform(state);
+            // Drive the central mic button state
+            const micBtn = document.getElementById('voice-mute-btn');
+            if (micBtn) {
+                micBtn.classList.toggle('ai-speaking', state === 'speaking');
+            }
+            // Avatar ring glow
             const wrap = document.querySelector('.voice-call-avatar-wrap');
             if (wrap) wrap.classList.toggle('ai-speaking', state === 'speaking');
         }
@@ -2678,15 +2680,25 @@ function endVoiceCall() {
     _setVoiceWaveform('idle');
     const wrap = document.querySelector('.voice-call-avatar-wrap');
     if (wrap) wrap.classList.remove('ai-speaking');
+    // Reset mic button
+    const micBtn = document.getElementById('voice-mute-btn');
+    if (micBtn) {
+        micBtn.classList.remove('muted', 'ai-speaking');
+        const label = document.getElementById('voice-mic-label');
+        if (label) label.textContent = 'Tap to mute';
+    }
 }
 
 function toggleVoiceMute() {
     if (!_voiceSession) return;
-    const muteBtn = document.getElementById('voice-mute-btn');
-    const nowMuted = muteBtn.classList.toggle('muted');
+    const micBtn = document.getElementById('voice-mute-btn');
+    const nowMuted = micBtn.classList.toggle('muted');
     _voiceSession.setMuted(nowMuted);
-    muteBtn.title = nowMuted ? 'Unmute microphone' : 'Mute microphone';
-    muteBtn.setAttribute('aria-label', nowMuted ? 'Unmute microphone' : 'Mute microphone');
+    // Update accessibility + label
+    const label = document.getElementById('voice-mic-label');
+    if (label) label.textContent = nowMuted ? 'Unmute' : 'Tap to mute';
+    micBtn.title = nowMuted ? 'Unmute microphone' : 'Mute microphone';
+    micBtn.setAttribute('aria-label', nowMuted ? 'Unmute microphone' : 'Mute microphone — active');
 }
 
 function _setVoiceStatus(text) {
@@ -2695,11 +2707,14 @@ function _setVoiceStatus(text) {
 }
 
 function _setVoiceWaveform(state) {
-    const wf = document.getElementById('voice-waveform');
-    if (!wf) return;
-    wf.classList.remove('listening', 'speaking');
-    if (state === 'listening') wf.classList.add('listening');
-    if (state === 'speaking') wf.classList.add('speaking');
+    // Sync both side waveform panels
+    ['voice-waveform', 'voice-waveform-left'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('listening', 'speaking');
+        if (state === 'listening') el.classList.add('listening');
+        if (state === 'speaking') el.classList.add('speaking');
+    });
 }
 
 function _clearTranscript() {
