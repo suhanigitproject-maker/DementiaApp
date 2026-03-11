@@ -867,6 +867,37 @@ def uploaded_file(filename):
     """Serve uploaded files"""
     return send_from_directory(UPLOAD_FOLDER, filename)
 
+@app.route('/api/live-config', methods=['GET'])
+def live_config():
+    """
+    Return the Gemini Live API config for the frontend WebSocket connection.
+    Keeping the key server-side and serving it fresh prevents it from being
+    hardcoded in static JS while still allowing browser-direct WebSocket usage.
+    """
+    profile = load_profile()
+    name = profile.get('preferred_name') or profile.get('name') or 'friend'
+    language = profile.get('app_language', 'en')
+    LANG_NAMES = {
+        'en': 'English', 'fr': 'French', 'es': 'Spanish', 'de': 'German',
+        'it': 'Italian', 'pt': 'Portuguese', 'hi': 'Hindi', 'ar': 'Arabic',
+        'zh': 'Mandarin Chinese', 'ja': 'Japanese', 'ko': 'Korean', 'pa': 'Punjabi',
+    }
+    lang_name = LANG_NAMES.get(language, 'English')
+    voice_system_prompt = (
+        f"You are Aegis, a warm, calm, and compassionate AI voice companion designed to support "
+        f"elderly people through supportive conversation. You are speaking with {name}. "
+        f"Keep your responses brief (1-3 sentences), warm, and easy to understand. "
+        f"Speak slowly and clearly. Always respond in {lang_name}. "
+        f"You are here to listen, comfort, and engage in friendly conversation. "
+        f"Ask gentle follow-up questions to keep the conversation going. "
+        f"Avoid complex topics unless the user brings them up. Be patient and kind."
+    )
+    return jsonify({
+        'apiKey': GEMINI_API_KEY,
+        'systemPrompt': voice_system_prompt,
+        'userName': name
+    })
+
 if __name__ == '__main__':
     print("🚀 Starting Chat Server...")
     print("📡 Server running on http://127.0.0.1:5001")

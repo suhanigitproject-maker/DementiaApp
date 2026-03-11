@@ -2269,6 +2269,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initChat();
     initProfile();
     initNotes();
+    initVoiceCall();
 
     await loadRoutines();
     await loadMemories();
@@ -2283,3 +2284,446 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Render Home tab dashboard
     renderHomeTab();
 });
+
+// ===================================
+// GEMINI LIVE API — VOICE MODULE
+// ===================================
+
+/**
+ * GeminiLiveSession encapsulates the WebSocket connection, microphone
+ * capture pipeline, and PCM audio playback for the Gemini Live API.
+ *
+ * Audio in:  16-bit PCM, 16 kHz mono (browser mic → Gemini)
+ * Audio out: 16-bit PCM, 24 kHz mono (Gemini → browser speaker)
+ */
+class GeminiLiveSession {
+    constructor({ apiKey, systemPrompt, onStatus, onTranscript, onStateChange }) {
+        this.apiKey = apiKey;
+        this.systemPrompt = systemPrompt;
+        this.onStatus = onStatus || (() => { });
+        this.onTranscript = onTranscript || (() => { });
+        this.onStateChange = onStateChange || (() => { });
+
+        this.ws = null;
+        this.audioCtx = null;
+        this.micStream = null;
+        this.micProcessor = null;
+        this.isMuted = false;
+        this.isConnected = false;
+        this.audioQueue = [];      // queued PCM chunks from Gemini
+        this.isPlaying = false;    // guards sequential playback
+        this.nextPlayTime = 0;     // AudioContext schedule cursor
+    }
+
+    // ── Public API ────────────────────────────────────────────────
+
+    async start() {
+        this.onStatus('Connecting…');
+        try {
+            await this._openWebSocket();
+            await this._startMicrophone();
+        } catch (err) {
+            console.error('[Voice] start error', err);
+            this.onStatus('Failed to connect: ' + (err.message || err));
+            this.stop();
+        }
+    }
+
+    stop() {
+        this._intentionalStop = true; // prevents onclose from showing 'Disconnected'
+        this._stopMicrophone();
+        if (this.ws) {
+            try { this.ws.close(); } catch (_) { }
+            this.ws = null;
+        }
+        if (this.audioCtx) {
+            try { this.audioCtx.close(); } catch (_) { }
+            this.audioCtx = null;
+        }
+        this.isConnected = false;
+        this._intentionalStop = false;
+        this.audioQueue = [];
+        this.isPlaying = false;
+        this.onStateChange('idle');
+    }
+
+    setMuted(muted) {
+        this.isMuted = muted;
+        if (this.micStream) {
+            this.micStream.getAudioTracks().forEach(t => (t.enabled = !muted));
+        }
+    }
+
+    // ── WebSocket ────────────────────────────────────────────────
+
+    _openWebSocket() {
+        return new Promise((resolve, reject) => {
+            const MODEL = 'gemini-2.5-flash-native-audio-preview-12-2025';
+
+            const WS_URL = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${this.apiKey}`;
+
+            this.ws = new WebSocket(WS_URL);
+
+            this.ws.onopen = () => {
+                // Official Gemini Live API setup message format
+                // (matches google-gemini/gemini-live-api-examples exactly)
+                const setupMsg = {
+                    setup: {
+                        model: `models/${MODEL}`,
+                        generationConfig: {
+                            responseModalities: ['AUDIO'],
+                            speechConfig: {
+                                voiceConfig: {
+                                    prebuiltVoiceConfig: { voiceName: 'Aoede' }
+                                }
+                            }
+                        },
+                        systemInstruction: {
+                            parts: [{ text: this.systemPrompt }]
+                        },
+                        // Enable live transcripts for both sides
+                        inputAudioTranscription: {},
+                        outputAudioTranscription: {}
+                    }
+                };
+                this.ws.send(JSON.stringify(setupMsg));
+                console.log('[Voice] Setup sent, waiting for setupComplete…');
+            };
+
+            this.ws.onmessage = async (event) => {
+                // Gemini sends messages as Blob — must await .text() before parsing
+                let jsonStr;
+                try {
+                    if (event.data instanceof Blob) {
+                        jsonStr = await event.data.text();
+                    } else if (event.data instanceof ArrayBuffer) {
+                        jsonStr = new TextDecoder().decode(event.data);
+                    } else {
+                        jsonStr = event.data;
+                    }
+                } catch (e) {
+                    console.error('[Voice] Failed to read message data', e);
+                    return;
+                }
+
+                let msg;
+                try { msg = JSON.parse(jsonStr); } catch { return; }
+
+                console.log('[Voice] Server message:', Object.keys(msg));
+
+                // Server confirms setup is ready
+                if (msg.setupComplete !== undefined) {
+                    console.log('[Voice] Setup complete — session is live');
+                    this.isConnected = true;
+                    this.onStatus('Listening…');
+                    this.onStateChange('listening');
+                    resolve();
+                    return;
+                }
+
+                this._handleServerMessage(msg);
+            };
+
+            this.ws.onerror = (err) => {
+                console.error('[Voice] WebSocket error', err);
+                if (!this.isConnected) {
+                    reject(new Error('Connection refused — check that your API key has Live API access.'));
+                }
+            };
+
+            this.ws.onclose = (ev) => {
+                console.log('[Voice] WebSocket closed', ev.code, ev.reason);
+                if (!this.isConnected && !this._intentionalStop) {
+                    // Failed before setupComplete
+                    reject(new Error(`Connection closed before setup (code ${ev.code}). Check your API key.`));
+                } else if (this.isConnected && !this._intentionalStop) {
+                    // Unexpected drop mid-session
+                    this.onStatus('Disconnected');
+                    this.onStateChange('idle');
+                }
+                this.isConnected = false;
+            };
+        });
+    }
+
+    _handleServerMessage(msg) {
+        // ── Server content (audio + transcripts) ──
+        if (msg.serverContent) {
+            const sc = msg.serverContent;
+
+            // Collect audio chunks from this turn part
+            if (sc.modelTurn?.parts) {
+                let hasAudio = false;
+                for (const part of sc.modelTurn.parts) {
+                    if (part.inlineData?.data) {
+                        this._enqueueAudio(part.inlineData.data);
+                        hasAudio = true;
+                    }
+                }
+                if (hasAudio) {
+                    this.onStatus('Aegis is speaking…');
+                    this.onStateChange('speaking');
+                }
+            }
+
+            // Turn complete — play all queued audio then go back to listening
+            if (sc.turnComplete) {
+                this._playQueued().then(() => {
+                    if (this.isConnected) {
+                        this.onStatus('Listening…');
+                        this.onStateChange('listening');
+                    }
+                });
+            }
+
+            // Input transcript (what the user said)
+            if (sc.inputTranscription?.text) {
+                this.onTranscript('user', sc.inputTranscription.text);
+            }
+            // Output transcript (what Aegis said)
+            if (sc.outputTranscription?.text) {
+                this.onTranscript('ai', sc.outputTranscription.text);
+            }
+        }
+    }
+
+    // ── Microphone ────────────────────────────────────────────────
+
+    async _startMicrophone() {
+        this.audioCtx = new AudioContext({ sampleRate: 16000 });
+        this.micStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                channelCount: 1,
+                sampleRate: 16000,
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            }
+        });
+
+        const source = this.audioCtx.createMediaStreamSource(this.micStream);
+        // ScriptProcessor is deprecated but universally supported in browsers
+        const bufferSize = 4096;
+        this.micProcessor = this.audioCtx.createScriptProcessor(bufferSize, 1, 1);
+
+        this.micProcessor.onaudioprocess = (e) => {
+            if (!this.isConnected || this.isMuted) return;
+            const float32 = e.inputBuffer.getChannelData(0);
+            const pcm16 = this._float32ToPcm16(float32);
+            const b64 = this._arrayBufferToBase64(pcm16.buffer);
+            const msg = {
+                realtimeInput: {
+                    // Official format: audio is a blob {mimeType, data}
+                    audio: { mimeType: 'audio/pcm', data: b64 }
+                }
+            };
+            if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                this.ws.send(JSON.stringify(msg));
+            }
+        };
+
+        source.connect(this.micProcessor);
+        // Route through a zero-gain node so the ScriptProcessor graph stays
+        // alive (onaudioprocess fires) without echoing mic audio to speakers.
+        const silentGain = this.audioCtx.createGain();
+        silentGain.gain.value = 0;
+        this.micProcessor.connect(silentGain);
+        silentGain.connect(this.audioCtx.destination);
+    }
+
+    _stopMicrophone() {
+        if (this.micProcessor) {
+            try { this.micProcessor.disconnect(); } catch (_) { }
+            this.micProcessor = null;
+        }
+        if (this.micStream) {
+            this.micStream.getTracks().forEach(t => t.stop());
+            this.micStream = null;
+        }
+    }
+
+    // ── Audio playback ────────────────────────────────────────────
+
+    _enqueueAudio(base64Data) {
+        this.audioQueue.push(base64Data);
+    }
+
+    async _playQueued() {
+        if (this.isPlaying) return;
+        this.isPlaying = true;
+        this.onStatus('Aegis is speaking…');
+
+        // Build a separate playback AudioContext at 24 kHz
+        const playCtx = new AudioContext({ sampleRate: 24000 });
+        this.nextPlayTime = playCtx.currentTime;
+
+        for (const b64 of this.audioQueue) {
+            const pcmBytes = this._base64ToArrayBuffer(b64);
+            const samples = pcmBytes.byteLength / 2;
+            const audioBuffer = playCtx.createBuffer(1, samples, 24000);
+            const channelData = audioBuffer.getChannelData(0);
+            const view = new DataView(pcmBytes);
+            for (let i = 0; i < samples; i++) {
+                // 16-bit little-endian → float32 [-1, 1]
+                channelData[i] = view.getInt16(i * 2, true) / 32768.0;
+            }
+            const src = playCtx.createBufferSource();
+            src.buffer = audioBuffer;
+            src.connect(playCtx.destination);
+            src.start(this.nextPlayTime);
+            this.nextPlayTime += audioBuffer.duration;
+        }
+        this.audioQueue = [];
+
+        // Wait for all audio to finish
+        const waitMs = Math.max(0, (this.nextPlayTime - playCtx.currentTime) * 1000);
+        await new Promise(r => setTimeout(r, waitMs + 200));
+        try { playCtx.close(); } catch (_) { }
+        this.isPlaying = false;
+    }
+
+    // ── Utility ───────────────────────────────────────────────────
+
+    _float32ToPcm16(float32Array) {
+        const buf = new Int16Array(float32Array.length);
+        for (let i = 0; i < float32Array.length; i++) {
+            const s = Math.max(-1, Math.min(1, float32Array[i]));
+            buf[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
+        return buf;
+    }
+
+    _arrayBufferToBase64(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+        return btoa(binary);
+    }
+
+    _base64ToArrayBuffer(b64) {
+        const binary = atob(b64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        return bytes.buffer;
+    }
+}
+
+// ── Voice UI controller ──────────────────────────────────────────
+
+let _voiceSession = null;
+
+function initVoiceCall() {
+    const openBtn = document.getElementById('voice-call-btn');
+    const endBtn = document.getElementById('voice-end-btn');
+    const muteBtn = document.getElementById('voice-mute-btn');
+
+    if (openBtn) openBtn.addEventListener('click', openVoiceCall);
+    if (endBtn) endBtn.addEventListener('click', endVoiceCall);
+    if (muteBtn) muteBtn.addEventListener('click', toggleVoiceMute);
+}
+
+async function openVoiceCall() {
+    // Show overlay immediately
+    document.getElementById('voice-call-modal').classList.add('active');
+    _setVoiceStatus('Fetching config…');
+    _setVoiceWaveform('idle');
+    _clearTranscript();
+
+    // Reset mute button
+    const muteBtn = document.getElementById('voice-mute-btn');
+    if (muteBtn) muteBtn.classList.remove('muted');
+
+    // Fetch API key + system prompt from our backend
+    let config;
+    try {
+        const res = await fetch('/api/live-config');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        config = await res.json();
+    } catch (err) {
+        _setVoiceStatus('Could not load config: ' + err.message);
+        console.error('[Voice] config fetch error', err);
+        return;
+    }
+
+    if (!config.apiKey) {
+        _setVoiceStatus('API key not configured.');
+        return;
+    }
+
+    _voiceSession = new GeminiLiveSession({
+        apiKey: config.apiKey,
+        systemPrompt: config.systemPrompt,
+        onStatus: _setVoiceStatus,
+        onTranscript: _appendTranscript,
+        onStateChange: (state) => {
+            if (state === 'listening') _setVoiceWaveform('listening');
+            else if (state === 'speaking') _setVoiceWaveform('speaking');
+            else _setVoiceWaveform('idle');
+
+            // Avatar glow
+            const wrap = document.querySelector('.voice-call-avatar-wrap');
+            if (wrap) wrap.classList.toggle('ai-speaking', state === 'speaking');
+        }
+    });
+
+    await _voiceSession.start();
+}
+
+function endVoiceCall() {
+    if (_voiceSession) {
+        _voiceSession.stop();
+        _voiceSession = null;
+    }
+    document.getElementById('voice-call-modal').classList.remove('active');
+    _setVoiceWaveform('idle');
+    const wrap = document.querySelector('.voice-call-avatar-wrap');
+    if (wrap) wrap.classList.remove('ai-speaking');
+}
+
+function toggleVoiceMute() {
+    if (!_voiceSession) return;
+    const muteBtn = document.getElementById('voice-mute-btn');
+    const nowMuted = muteBtn.classList.toggle('muted');
+    _voiceSession.setMuted(nowMuted);
+    muteBtn.title = nowMuted ? 'Unmute microphone' : 'Mute microphone';
+    muteBtn.setAttribute('aria-label', nowMuted ? 'Unmute microphone' : 'Mute microphone');
+}
+
+function _setVoiceStatus(text) {
+    const el = document.getElementById('voice-status');
+    if (el) el.textContent = text;
+}
+
+function _setVoiceWaveform(state) {
+    const wf = document.getElementById('voice-waveform');
+    if (!wf) return;
+    wf.classList.remove('listening', 'speaking');
+    if (state === 'listening') wf.classList.add('listening');
+    if (state === 'speaking') wf.classList.add('speaking');
+}
+
+function _clearTranscript() {
+    const inner = document.getElementById('voice-transcript-inner');
+    if (inner) inner.innerHTML = '<p class="voice-transcript-hint">Your conversation will appear here…</p>';
+}
+
+function _appendTranscript(role, text) {
+    const inner = document.getElementById('voice-transcript-inner');
+    if (!inner) return;
+
+    // Remove the hint if still present
+    const hint = inner.querySelector('.voice-transcript-hint');
+    if (hint) hint.remove();
+
+    const line = document.createElement('p');
+    line.className = `voice-transcript-line ${role}`;
+    line.textContent = text;
+    inner.appendChild(line);
+
+    // Auto-scroll
+    const container = document.getElementById('voice-transcript');
+    if (container) container.scrollTop = container.scrollHeight;
+
+    // Also add to the main chat view so the conversation is preserved
+    addChatMessage(text, role === 'user' ? 'user' : 'ai');
+}
