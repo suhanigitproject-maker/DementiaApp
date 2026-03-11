@@ -626,6 +626,9 @@ function switchTab(tabName) {
 
     // Render Notes tab when switching to it
     if (tabName === 'notes') renderNotesTab();
+
+    // Pre-load voice config when entering the chat tab
+    if (tabName === 'chat') _initInlineVoice();
 }
 
 // ===================================
@@ -1823,9 +1826,13 @@ function readDoctorsFromDOM() {
  * Apply theme CSS class to body based on selection.
  */
 function applyTheme(theme) {
+    // Use data-theme attribute so CSS variable overrides work
+    const t = theme || 'default';
+    document.documentElement.setAttribute('data-theme', t);
+    // Legacy class support (theme-anim-canvas etc.)
     document.body.classList.remove('theme-ocean', 'theme-forest');
-    if (theme === 'ocean') document.body.classList.add('theme-ocean');
-    if (theme === 'forest') document.body.classList.add('theme-forest');
+    if (t === 'ocean') document.body.classList.add('theme-ocean');
+    if (t === 'forest') document.body.classList.add('theme-forest');
 }
 
 async function loadProfile() {
@@ -2608,19 +2615,184 @@ class GeminiLiveSession {
     }
 }
 
-// ── Voice UI controller ──────────────────────────────────────────
-
+// ── Shared voice session for both inline and modal ────────────────
 let _voiceSession = null;
+let _inlineVoiceReady = false;  // config fetched at least once
+let _inlineLiveConfig = null;   // cached config
 
+// ── Modal voice UI (full-screen overlay) ─────────────────────────
 function initVoiceCall() {
-    const openBtn = document.getElementById('voice-call-btn');
     const endBtn = document.getElementById('voice-end-btn');
     const muteBtn = document.getElementById('voice-mute-btn');
-
-    if (openBtn) openBtn.addEventListener('click', openVoiceCall);
     if (endBtn) endBtn.addEventListener('click', endVoiceCall);
     if (muteBtn) muteBtn.addEventListener('click', toggleVoiceMute);
 }
+
+// ── Inline voice UI (inside chat tab) ────────────────────────────
+let _inlineVoiceInit = false;
+
+function _initInlineVoice() {
+    // Only wire listeners once
+    if (_inlineVoiceInit) return;
+    _inlineVoiceInit = true;
+
+    const micBtn = document.getElementById('inline-mic-btn');
+    const toTextBtn = document.getElementById('switch-to-text-btn');
+    const toVoiceBtn = document.getElementById('switch-to-voice-btn');
+
+    // Mode toggle: voice → text
+    if (toTextBtn) toTextBtn.addEventListener('click', () => {
+        _stopInlineVoice();
+        document.getElementById('chat-voice-panel').classList.add('hidden');
+        document.getElementById('chat-text-panel').classList.remove('hidden');
+        const s = document.getElementById('chat-mode-status');
+        if (s) s.textContent = 'Text Mode';
+    });
+
+    // Mode toggle: text → voice
+    if (toVoiceBtn) toVoiceBtn.addEventListener('click', () => {
+        document.getElementById('chat-text-panel').classList.add('hidden');
+        document.getElementById('chat-voice-panel').classList.remove('hidden');
+        const s = document.getElementById('chat-mode-status');
+        if (s) s.textContent = 'Voice Mode — ready';
+    });
+
+    // Mic button: first tap = start session, subsequent = mute toggle
+    if (micBtn) micBtn.addEventListener('click', async () => {
+        if (!_voiceSession) {
+            await _startInlineVoice();
+        } else {
+            // Toggle mute
+            const nowMuted = micBtn.classList.toggle('muted');
+            _voiceSession.setMuted(nowMuted);
+            const lbl = document.getElementById('inline-mic-label');
+            if (lbl) lbl.textContent = nowMuted ? 'Unmute' : 'Speaking…';
+        }
+    });
+}
+
+async function _startInlineVoice() {
+    const micBtn = document.getElementById('inline-mic-btn');
+    const lbl = document.getElementById('inline-mic-label');
+    const status = document.getElementById('chat-mode-status');
+
+    if (lbl) lbl.textContent = 'Connecting…';
+    if (status) status.textContent = 'Connecting…';
+
+    // Fetch config (cached after first call)
+    if (!_inlineLiveConfig) {
+        try {
+            const res = await fetch('/api/live-config');
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            _inlineLiveConfig = await res.json();
+        } catch (err) {
+            if (lbl) lbl.textContent = 'Config error';
+            if (status) status.textContent = 'Could not connect. Try again.';
+            console.error('[InlineVoice] config error', err);
+            return;
+        }
+    }
+
+    if (!_inlineLiveConfig.apiKey) {
+        if (lbl) lbl.textContent = 'No API key';
+        return;
+    }
+
+    // Clear inline transcript
+    _clearInlineTranscript();
+
+    _voiceSession = new GeminiLiveSession({
+        apiKey: _inlineLiveConfig.apiKey,
+        systemPrompt: _inlineLiveConfig.systemPrompt,
+
+        onStatus: (text) => {
+            if (status) status.textContent = text;
+        },
+
+        onTranscript: (role, text) => {
+            // Mirror to inline transcript
+            _appendInlineTranscript(role, text);
+            // Also mirror to text chat panel
+            _appendTranscript(role, text);
+        },
+
+        onStateChange: (state) => {
+            _setInlineMicState(state);
+            // Also drive the modal waveform (keeps consistency)
+            _setVoiceWaveform(state);
+        }
+    });
+
+    try {
+        await _voiceSession.start();
+        if (lbl) lbl.textContent = 'Tap to mute';
+        if (micBtn) micBtn.classList.remove('muted');
+    } catch (err) {
+        console.error('[InlineVoice] start error', err);
+        if (lbl) lbl.textContent = 'Tap to retry';
+        if (status) status.textContent = 'Connection failed — tap mic to retry';
+        _voiceSession = null;
+    }
+}
+
+function _stopInlineVoice() {
+    if (_voiceSession) {
+        _voiceSession.stop();
+        _voiceSession = null;
+    }
+    _setInlineMicState('idle');
+    const lbl = document.getElementById('inline-mic-label');
+    if (lbl) lbl.textContent = 'Tap to speak';
+}
+
+function _setInlineMicState(state) {
+    const micBtn = document.getElementById('inline-mic-btn');
+    const wf = document.getElementById('inline-waveform');
+    const lbl = document.getElementById('inline-mic-label');
+    const status = document.getElementById('chat-mode-status');
+
+    if (micBtn) {
+        micBtn.classList.remove('listening', 'ai-speaking');
+        if (state === 'listening') micBtn.classList.add('listening');
+        if (state === 'speaking') micBtn.classList.add('ai-speaking');
+    }
+    if (wf) {
+        wf.classList.remove('listening', 'speaking');
+        if (state === 'listening') wf.classList.add('listening');
+        if (state === 'speaking') wf.classList.add('speaking');
+    }
+    if (lbl) {
+        if (state === 'listening') lbl.textContent = 'Listening…';
+        else if (state === 'speaking') lbl.textContent = 'Aegis speaking…';
+        else if (state !== 'idle') lbl.textContent = state;
+    }
+    if (status) {
+        if (state === 'listening') status.textContent = 'Voice Mode — listening';
+        else if (state === 'speaking') status.textContent = 'Voice Mode — Aegis speaking';
+        else if (state === 'idle') status.textContent = 'Voice Mode — ready';
+    }
+}
+
+function _clearInlineTranscript() {
+    const box = document.getElementById('inline-transcript');
+    if (!box) return;
+    box.innerHTML = '<p id="inline-transcript-hint">Your conversation will appear here…</p>';
+}
+
+function _appendInlineTranscript(role, text) {
+    if (!text || !text.trim()) return;
+    const box = document.getElementById('inline-transcript');
+    if (!box) return;
+    const hint = document.getElementById('inline-transcript-hint');
+    if (hint) hint.remove();
+
+    const line = document.createElement('div');
+    line.className = `vil-line ${role === 'user' ? 'user' : 'ai'}`;
+    line.textContent = text;
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+}
+
 
 async function openVoiceCall() {
     // Show overlay immediately
