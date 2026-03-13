@@ -589,6 +589,41 @@ body {
     box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
 }
 
+.family-call-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-sky) 100%);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
+    text-decoration: none;
+    width: 100%;
+}
+
+.family-call-btn:hover {
+    opacity: 0.92;
+    box-shadow: 0 4px 14px rgba(20, 184, 166, 0.4);
+    transform: translateY(-1px);
+    color: var(--color-white);
+}
+
+.family-call-btn:active {
+    transform: translateY(1px);
+}
+
+.family-call-btn svg {
+    display: block;
+}
+
 /* ── inline action buttons on cards ── */
 .text-button {
     padding: 0.35rem 0.85rem;
@@ -2728,6 +2763,12 @@ html[dir="rtl"] .profile-entry-header {
     letter-spacing: 0.05em;
     text-transform: uppercase;
     color: rgba(147, 210, 240, 0.6);
+    pointer-events: none;
+}
+
+.voice-mic-center svg {
+    display: block;
+    flex-shrink: 0;
     pointer-events: none;
 }
 
