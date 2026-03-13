@@ -425,6 +425,24 @@ Object.assign(TRANSLATIONS.en, {
     family_add_activity: 'Add Activity', family_add_date: 'Add Date', family_save: 'Save Family Member',
     // Profile extras
     profile_save_label: 'Save Profile', profile_add_contact: '+ Add Emergency Contact', profile_add_doctor: '+ Add Doctor',
+
+    // Albums extras
+    tab_albums: 'Albums',
+    albums_title: 'Photo Albums',
+    albums_add: '+ Add Album',
+    album_modal_title_add: 'Add Album',
+    album_modal_title_edit: 'Edit Album',
+    album_label_title: 'Album Title',
+    album_label_desc: 'Description',
+    album_save: 'Save Album',
+    albums_empty: 'No albums yet. Create one to store your photos.',
+    album_photo: 'Photo',
+    album_photos: 'Photos',
+    delete_album_confirm: 'Are you sure you want to delete this album and all its photos?',
+    album_no_photos: 'No photos in this album yet. Click + Add Photo to upload.',
+    delete_album_photo_confirm: 'Are you sure you want to delete this photo from the album?',
+    uploading_photos: 'Uploading photos...',
+    photos_added: 'Photos added successfully!'
 });
 
 // ── Extend every other language with the same extra keys (translated) ──

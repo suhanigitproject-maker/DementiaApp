@@ -29,6 +29,7 @@
             <button class="tab-button" data-tab="chat" data-i18n="tab_chat">Chat</button>
             <button class="tab-button" data-tab="routines" data-i18n="tab_routines">Routines</button>
             <button class="tab-button" data-tab="memories" data-i18n="tab_memories">Memories</button>
+            <button class="tab-button" data-tab="albums" data-i18n="tab_albums">Albums</button>
             <button class="tab-button" data-tab="family" data-i18n="tab_family">Family</button>
             <button class="tab-button" data-tab="notes" data-i18n="tab_notes">Notes</button>
             <button class="tab-button" data-tab="profile" data-i18n="tab_profile">Profile</button>
@@ -170,6 +171,42 @@
                     </div>
                     <div class="content-grid" id="memories-list">
                         <!-- Memories will be populated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAMILY TAB -->
+            <!-- ALBUMS TAB -->
+            <section id="albums-tab" class="tab-content">
+                <div class="page-content">
+                    <!-- Album List View (shows grid of album cards) -->
+                    <div id="album-list-view">
+                        <div class="tab-header">
+                            <h2 class="tab-title" data-i18n="albums_title">Photo Albums</h2>
+                            <button class="add-button" id="add-album-btn" data-i18n="albums_add">+ Add Album</button>
+                        </div>
+                        <div class="content-grid" id="albums-list">
+                            <!-- Albums will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Album Detail View (shows photos in a specific album) -->
+                    <div id="album-detail-view" style="display: none;">
+                        <div class="tab-header">
+                            <button class="text-button" id="back-to-albums-btn">← Back to Albums</button>
+                            <h2 class="tab-title" id="current-album-title">Album Title</h2>
+                            <button class="add-button" id="add-photo-btn">+ Add Photo</button>
+                        </div>
+                        <p id="current-album-desc" class="item-description"
+                            style="margin-top: -10px; margin-bottom: 20px;"></p>
+
+                        <!-- Hidden input for file picking -->
+                        <input type="file" id="album-photo-upload-input" accept="image/*" multiple
+                            style="display: none;">
+
+                        <div class="albums-photo-grid" id="album-photos-grid">
+                            <!-- Photos will be populated here -->
+                        </div>
                     </div>
                 </div>
             </section>
@@ -635,6 +672,34 @@
         </main>
     </div>
 
+    <!-- ALBUM MODAL -->
+    <div id="album-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="album-modal-title" data-i18n="album_modal_title_add">Add Album</h2>
+                <button class="close-button" id="close-album-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="album-form">
+                    <input type="hidden" id="album-id-input">
+                    <div class="form-group">
+                        <label for="album-title" data-i18n="album_label_title">Album Title</label>
+                        <input type="text" id="album-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="album-desc" data-i18n="album_label_desc">Description (Optional)</label>
+                        <textarea id="album-desc" rows="3"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-button" id="cancel-album-modal"
+                            data-i18n="modal_cancel">Cancel</button>
+                        <button type="submit" class="save-button" data-i18n="album_save">Save Album</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- ROUTINE MODAL -->
     <div id="routine-modal" class="modal-overlay">
         <div class="modal">
@@ -992,6 +1057,7 @@
     </div>
 
 
+    <script src="services/albumService.js"></script>
     <script src="script.js?v=7"></script>
 
 </body>

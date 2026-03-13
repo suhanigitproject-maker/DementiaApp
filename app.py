@@ -34,19 +34,36 @@ except ImportError:
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
 
-# File to store memories
-# File to store memories
+# Vercel Serverless Function Compatibility
+IS_VERCEL = os.environ.get("VERCEL") == "1"
+
+def get_read_path(base_path):
+    if IS_VERCEL:
+        tmp_path = os.path.join("/tmp", os.path.basename(base_path))
+        if os.path.exists(tmp_path):
+            return tmp_path
+    return base_path
+
+def get_write_path(base_path):
+    if IS_VERCEL:
+        return os.path.join("/tmp", os.path.basename(base_path))
+    return base_path
+
+# File paths
 MEMORIES_FILE = "memories.json"
 PROFILE_FILE = "profile.json"
 ROUTINES_FILE = "routines.json"
 FAMILY_FILE = "family.json"
 CHAT_FILE = "chat.json"
 NOTES_FILE = "notes.json"
-UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'webm'}
+ALBUMS_FILE = "data/albums.json"
+UPLOAD_FOLDER = get_write_path("uploads")
 
 if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+    try:
+        os.makedirs(UPLOAD_FOLDER)
+    except OSError:
+        pass
 
 # System prompt for elderly care assistant
 SYSTEM_PROMPT = """
@@ -64,6 +81,7 @@ You have access to the user's personal data provided in the context below. This 
 - Memories (past stories, experiences, and life history)
 - Chat History (previous conversations even across sessions)
 - Family & Contacts (people, relationships, and important dates)
+- Photo Albums (collections of photos and photo counts)
 - Profile (basic identity and health context)
 
 BEHAVIOR RULES
@@ -247,9 +265,10 @@ DEFAULT_MEMORIES = {
 def load_memories():
     """Load memories from JSON file, ensuring all fields exist"""
     memories = DEFAULT_MEMORIES.copy()
-    if os.path.exists(MEMORIES_FILE):
+    read_path = get_read_path(MEMORIES_FILE)
+    if os.path.exists(read_path):
         try:
-            with open(MEMORIES_FILE, 'r') as f:
+            with open(read_path, 'r') as f:
                 loaded_data = json.load(f)
                 # Update default structure with loaded data (preserves defaults for missing keys)
                 memories.update(loaded_data)
@@ -265,14 +284,16 @@ def load_memories():
 def save_memories(memories_data):
     """Save memories to JSON file"""
     memories_data["last_updated"] = datetime.now().isoformat()
-    with open(MEMORIES_FILE, 'w') as f:
+    write_path = get_write_path(MEMORIES_FILE)
+    with open(write_path, 'w') as f:
         json.dump(memories_data, f, indent=2)
 
 def load_profile():
     """Load profile from JSON file"""
-    if os.path.exists(PROFILE_FILE):
+    read_path = get_read_path(PROFILE_FILE)
+    if os.path.exists(read_path):
         try:
-            with open(PROFILE_FILE, 'r') as f:
+            with open(read_path, 'r') as f:
                 return json.load(f)
         except json.JSONDecodeError:
             pass
@@ -288,14 +309,16 @@ def load_profile():
 
 def save_profile(profile_data):
     """Save profile to JSON file"""
-    with open(PROFILE_FILE, 'w') as f:
+    write_path = get_write_path(PROFILE_FILE)
+    with open(write_path, 'w') as f:
         json.dump(profile_data, f, indent=2)
 
 def load_routines():
     """Load routines from JSON file"""
-    if os.path.exists(ROUTINES_FILE):
+    read_path = get_read_path(ROUTINES_FILE)
+    if os.path.exists(read_path):
         try:
-            with open(ROUTINES_FILE, 'r') as f:
+            with open(read_path, 'r') as f:
                 data = json.load(f)
                 # Ensure it's a list
                 if isinstance(data, list):
@@ -309,14 +332,16 @@ def load_routines():
 
 def save_routines(routines_data):
     """Save routines to JSON file"""
-    with open(ROUTINES_FILE, 'w') as f:
+    write_path = get_write_path(ROUTINES_FILE)
+    with open(write_path, 'w') as f:
         json.dump(routines_data, f, indent=2)
 
 def load_family():
     """Load family data from JSON file"""
-    if os.path.exists(FAMILY_FILE):
+    read_path = get_read_path(FAMILY_FILE)
+    if os.path.exists(read_path):
         try:
-            with open(FAMILY_FILE, 'r') as f:
+            with open(read_path, 'r') as f:
                 data = json.load(f)
                 if isinstance(data, list):
                     return data
@@ -327,9 +352,10 @@ def load_family():
 
 def load_chat_history_data():
     """Load chat history from JSON file"""
-    if os.path.exists(CHAT_FILE):
+    read_path = get_read_path(CHAT_FILE)
+    if os.path.exists(read_path):
         try:
-            with open(CHAT_FILE, 'r') as f:
+            with open(read_path, 'r') as f:
                 return json.load(f)
         except json.JSONDecodeError:
             pass
@@ -337,8 +363,33 @@ def load_chat_history_data():
 
 def save_family(family_data):
     """Save family data to JSON file"""
-    with open(FAMILY_FILE, 'w') as f:
+    write_path = get_write_path(FAMILY_FILE)
+    with open(write_path, 'w') as f:
         json.dump(family_data, f, indent=2)
+
+def load_albums():
+    """Load albums data from JSON file"""
+    read_path = get_read_path(ALBUMS_FILE)
+    if os.path.exists(read_path):
+        try:
+            with open(read_path, 'r') as f:
+                data = json.load(f)
+                if isinstance(data, dict):
+                    return data
+                # migrate from old array
+                if isinstance(data, list):
+                    return {"albums": data}
+                return {"albums": []}
+        except json.JSONDecodeError:
+            pass
+    return {"albums": []}
+
+def save_albums(albums_data):
+    """Save albums data to JSON file"""
+    write_path = get_write_path(ALBUMS_FILE)
+    os.makedirs(os.path.dirname(write_path) if os.path.dirname(write_path) else '.', exist_ok=True)
+    with open(write_path, 'w') as f:
+        json.dump(albums_data, f, indent=2)
 
 def merge_extracted_data(existing_data, new_data):
     """Merge new extracted data with existing memories"""
@@ -444,6 +495,7 @@ def chat():
             routines = load_routines()
             memories = load_memories()
             family = load_family()
+            albums = load_albums()
             past_chat = load_chat_history_data()
 
             # ---- Language context ----
@@ -507,7 +559,17 @@ LANGUAGE SETTINGS:
                     family_text += "\n"
                 context_parts.append(family_text)
 
-            # 5. Past Chat Context (Latest 10 messages for brevity)
+            # 5. Photo Albums Context
+            if albums and 'albums' in albums:
+                album_list = albums.get('albums', [])
+                if album_list:
+                    album_text = "PHOTO ALBUMS:\n"
+                    for a in album_list:
+                        count = len(a.get('photos', []))
+                        album_text += f"- {a.get('title')}: {a.get('description', '')} ({count} photos)\n"
+                    context_parts.append(album_text)
+
+            # 6. Past Chat Context (Latest 10 messages for brevity)
             if past_chat:
                 chat_text = "PAST CONVERSATIONS (RECAP):\n"
                 for msg in past_chat[-10:]:
@@ -641,7 +703,8 @@ LANGUAGE SETTINGS:
                 'content': conversational_response
             })
             
-            with open(CHAT_FILE, 'w') as f:
+            write_path = get_write_path(CHAT_FILE)
+            with open(write_path, 'w') as f:
                 json.dump(full_chat_history, f, indent=4)
         except Exception as e:
             print(f"Error saving automatic chat history: {e}")
@@ -665,7 +728,8 @@ def save_chat():
         if not chat_data:
             return jsonify({'error': 'No chat data provided'}), 400
             
-        with open(CHAT_FILE, 'w') as f:
+        write_path = get_write_path(CHAT_FILE)
+        with open(write_path, 'w') as f:
             json.dump(chat_data, f, indent=4)
         return jsonify({'message': 'Chat saved successfully!'})
     except Exception as e:
@@ -714,8 +778,9 @@ def handle_notes():
     try:
         # Load existing notes
         notes_list = []
-        if os.path.exists(NOTES_FILE):
-            with open(NOTES_FILE, 'r') as f:
+        read_path = get_read_path(NOTES_FILE)
+        if os.path.exists(read_path):
+            with open(read_path, 'r') as f:
                 data = json.load(f)
                 notes_list = data.get('notes', []) if isinstance(data, dict) else data
 
@@ -726,7 +791,8 @@ def handle_notes():
         body = request.get_json()
         if isinstance(body, list):
             # Replace entire list (bulk sync)
-            with open(NOTES_FILE, 'w') as f:
+            write_path = get_write_path(NOTES_FILE)
+            with open(write_path, 'w') as f:
                 json.dump({'notes': body}, f, indent=2)
             return jsonify({'status': 'success', 'notes': body})
 
@@ -738,7 +804,8 @@ def handle_notes():
             'created_at': datetime.now().isoformat()
         }
         notes_list.append(new_note)
-        with open(NOTES_FILE, 'w') as f:
+        write_path = get_write_path(NOTES_FILE)
+        with open(write_path, 'w') as f:
             json.dump({'notes': notes_list}, f, indent=2)
         return jsonify({'status': 'success', 'note': new_note})
 
@@ -813,6 +880,28 @@ def handle_routines():
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 
+@app.route('/api/albums', methods=['GET', 'POST'])
+def handle_albums():
+    """
+    Get or update user photo albums
+    """
+    if request.method == 'GET':
+        try:
+            albums = load_albums()
+            return jsonify(albums)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    
+    elif request.method == 'POST':
+        try:
+            data = request.get_json()
+            if not isinstance(data, dict) or 'albums' not in data:
+                return jsonify({'error': 'Data must be a dict with key "albums"'}), 400
+            save_albums(data)
+            return jsonify({'status': 'success', 'albums': data['albums']})
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
 @app.route('/api/family', methods=['GET', 'POST'])
 def handle_family():
     """
@@ -853,14 +942,25 @@ def upload_file():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+    files = request.files.getlist('file')
+    result = []
+    
+    for file in files:
+        if file.filename == '':
+            continue
+        if file:
+            filename = str(uuid.uuid4()) + "_" + file.filename
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            result.append({'url': f'/uploads/{filename}'})
+            
+    if not result:
+        return jsonify({'error': 'No selected file or invalid files'}), 400
         
-    if file:
-        filename = str(uuid.uuid4()) + "_" + file.filename
-        file.save(os.path.join(UPLOAD_FOLDER, filename))
-        return jsonify({'url': f'/uploads/{filename}'})
+    return jsonify({
+        'url': result[0]['url'],
+        'file_path': result[0]['url'],
+        'files': result
+    })
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):

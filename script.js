@@ -4,6 +4,8 @@
 let routines = [];
 let memories = [];
 let family = [];
+let albums = [];
+let currentAlbumId = null;
 let currentRoutineView = 'today';
 let currentMemoryFilter = 'all';
 let themeAnimRAF = null; // requestAnimationFrame handle for theme animations
@@ -46,6 +48,13 @@ function applyTranslation(lang) {
     if (typeof renderRoutines === 'function') renderRoutines();
     if (typeof renderMemories === 'function') renderMemories();
     if (typeof renderFamily === 'function') renderFamily();
+    if (typeof renderAlbums === 'function') {
+        renderAlbums();
+        if (currentAlbumId) {
+            const currentAlbum = albums.find(a => a.id === currentAlbumId);
+            if (currentAlbum) renderAlbumPhotos(currentAlbum);
+        }
+    }
     if (typeof renderNotesTab === 'function') renderNotesTab();
     if (typeof renderAllEmergencyContacts === 'function') renderAllEmergencyContacts();
     if (typeof renderAllDoctors === 'function') renderAllDoctors();
@@ -2289,12 +2298,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     initProfile();
     initNotes();
     initVoiceCall();
+    initAlbumsModal();
 
     await loadRoutines();
     await loadMemories();
     await loadFamily();
     await loadProfile();
     await loadNotes();
+    await loadAlbums();
 
     // Hide floating save button initially (not on profile tab at startup)
     const floatSave = document.getElementById('floating-save-profile-btn');
@@ -2986,3 +2997,269 @@ function _appendInlineTranscript(role, text) {
 
     box.scrollTop = box.scrollHeight;
 }
+
+// ===================================
+// ALBUMS MODULE
+// ===================================
+
+async function loadAlbums() {
+    try {
+        if (window.albumService) {
+            albums = await window.albumService.getAlbums();
+            renderAlbums();
+        }
+    } catch (error) {
+        console.error('Error loading albums:', error);
+    }
+}
+
+function renderAlbums() {
+    const list = document.getElementById('albums-list');
+    if (!list) return;
+
+    list.innerHTML = '';
+
+    if (!albums || albums.length === 0) {
+        list.innerHTML = `<div class="empty-state">
+            <div class="empty-icon">📷</div>
+            <p>${t('albums_empty', currentAppLang) || 'No albums yet. Create one to store your photos.'}</p>
+        </div>`;
+        return;
+    }
+
+    albums.forEach(album => {
+        const card = document.createElement('div');
+        card.className = 'content-card album-card';
+        card.onclick = (e) => {
+            // prevent opening if clicked on actions
+            if (e.target.closest('.item-actions')) return;
+            openAlbumView(album.id);
+        };
+        card.style.cursor = 'pointer';
+
+        const photoCount = album.photos ? album.photos.length : 0;
+        const firstPhoto = photoCount > 0 ? album.photos[0] : null;
+        const previewUrl = firstPhoto ? (firstPhoto.imageURI || firstPhoto.url) : '';
+        const previewElement = previewUrl
+            ? `<div class="album-preview" style="background-image: url('${previewUrl}')"></div>`
+            : `<div class="album-preview empty"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>`;
+
+        card.innerHTML = `
+            ${previewElement}
+            <div class="content-card-body">
+                <h3 class="item-title">${escapeHtml(album.title)}</h3>
+                ${album.description ? `<p class="item-description" style="margin-bottom: 0.5rem;">${escapeHtml(album.description)}</p>` : ''}
+                <p class="mem-date" style="margin-top: 0;">${photoCount} ${photoCount === 1 ? (t('album_photo', currentAppLang) || 'Photo') : (t('album_photos', currentAppLang) || 'Photos')}</p>
+                <div class="item-actions">
+                    <button class="text-button" onclick="editAlbum('${album.id}')">${t('btn_edit', currentAppLang) || 'Edit'}</button>
+                    <button class="text-button delete" onclick="deleteAlbum('${album.id}')">${t('btn_delete', currentAppLang) || 'Delete'}</button>
+                </div>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+function initAlbumsModal() {
+    const addBtn = document.getElementById('add-album-btn');
+    const modal = document.getElementById('album-modal');
+    const closeBtn = document.getElementById('close-album-modal');
+    const cancelBtn = document.getElementById('cancel-album-modal');
+    const form = document.getElementById('album-form');
+
+    const backBtn = document.getElementById('back-to-albums-btn');
+    const addPhotoBtn = document.getElementById('add-photo-btn');
+    const photoUploadInput = document.getElementById('album-photo-upload-input');
+
+    if (addBtn) addBtn.addEventListener('click', () => {
+        document.getElementById('album-form').reset();
+        document.getElementById('album-id-input').value = '';
+        document.getElementById('album-modal-title').textContent = t('album_modal_title_add', currentAppLang) || 'Add Album';
+        modal.classList.add('active');
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+    if (cancelBtn) cancelBtn.addEventListener('click', () => modal.classList.remove('active'));
+
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('album-id-input').value;
+            const title = document.getElementById('album-title').value;
+            const desc = document.getElementById('album-desc').value;
+
+            try {
+                if (id) {
+                    // Edit
+                    albums = await window.albumService.updateAlbum(albums, id, title, desc);
+                } else {
+                    // Add
+                    albums = await window.albumService.createAlbum(albums, title, desc);
+                }
+
+                renderAlbums();
+            } catch (err) {
+                showToast('Failed to save album', 'error');
+                return;
+            }
+            modal.classList.remove('active');
+
+            // If editing current album, update view
+            if (id && currentAlbumId === id) {
+                document.getElementById('current-album-title').textContent = title;
+                const descEl = document.getElementById('current-album-desc');
+                descEl.textContent = desc;
+                descEl.style.display = desc ? 'block' : 'none';
+            }
+        });
+    }
+
+    if (backBtn) backBtn.addEventListener('click', closeAlbumView);
+
+    if (addPhotoBtn && photoUploadInput) {
+        addPhotoBtn.addEventListener('click', () => photoUploadInput.click());
+        photoUploadInput.addEventListener('change', handleAlbumPhotoUpload);
+    }
+}
+
+function editAlbum(id) {
+    const album = albums.find(a => a.id === id);
+    if (!album) return;
+
+    document.getElementById('album-id-input').value = album.id;
+    document.getElementById('album-title').value = album.title || '';
+    document.getElementById('album-desc').value = album.description || '';
+
+    document.getElementById('album-modal-title').textContent = t('album_modal_title_edit', currentAppLang) || 'Edit Album';
+    document.getElementById('album-modal').classList.add('active');
+}
+
+async function deleteAlbum(id) {
+    const album = albums.find(a => a.id === id);
+    if (!album) return;
+
+    if (confirm(t('delete_album_confirm', currentAppLang) || `Are you sure you want to delete album "${album.title}" and all its photos?`)) {
+        albums = await window.albumService.deleteAlbum(albums, id);
+        renderAlbums();
+        if (currentAlbumId === id) {
+            closeAlbumView();
+        }
+    }
+}
+
+function openAlbumView(id) {
+    const album = albums.find(a => a.id === id);
+    if (!album) return;
+
+    currentAlbumId = id;
+
+    document.getElementById('album-list-view').style.display = 'none';
+    document.getElementById('album-detail-view').style.display = 'block';
+
+    document.getElementById('current-album-title').textContent = album.title;
+    const descEl = document.getElementById('current-album-desc');
+    if (album.description) {
+        descEl.textContent = album.description;
+        descEl.style.display = 'block';
+    } else {
+        descEl.style.display = 'none';
+    }
+
+    renderAlbumPhotos(album);
+}
+
+function closeAlbumView() {
+    currentAlbumId = null;
+    document.getElementById('album-list-view').style.display = 'block';
+    document.getElementById('album-detail-view').style.display = 'none';
+    renderAlbums(); // re-render to update counts
+}
+
+function renderAlbumPhotos(album) {
+    const grid = document.getElementById('album-photos-grid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+
+    if (!album.photos || album.photos.length === 0) {
+        grid.innerHTML = `<p class="item-description" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">${t('album_no_photos', currentAppLang) || 'No photos in this album yet. Click + Add Photo to upload.'}</p>`;
+        return;
+    }
+
+    album.photos.forEach(photo => {
+        const div = document.createElement('div');
+        div.className = 'album-photo-item';
+        div.innerHTML = `
+            <img src="${photo.imageURI || photo.url}" alt="Album photo">
+            <button class="delete-photo-btn" onclick="deleteAlbumPhoto('${album.id}', '${photo.id}')" title="Delete Photo">×</button>
+        `;
+        grid.appendChild(div);
+    });
+}
+
+async function deleteAlbumPhoto(albumId, photoId) {
+    const album = albums.find(a => a.id === albumId);
+    if (!album) return;
+
+    if (confirm(t('delete_album_photo_confirm', currentAppLang) || 'Are you sure you want to delete this photo from the album?')) {
+        albums = await window.albumService.removePhoto(albums, albumId, photoId);
+
+        const updatedAlbum = albums.find(a => a.id === albumId);
+        if (updatedAlbum) {
+            renderAlbumPhotos(updatedAlbum);
+        } else {
+            closeAlbumView();
+        }
+    }
+}
+
+async function handleAlbumPhotoUpload(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0 || !currentAlbumId) return;
+
+    const album = albums.find(a => a.id === currentAlbumId);
+    if (!album) return;
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        formData.append('file', files[i]);
+    }
+
+    showToast(t('uploading_photos', currentAppLang) || 'Uploading photos...', 'info');
+
+    try {
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        let result = await response.json();
+
+        let uploadedFiles = [];
+        if (result.files && Array.isArray(result.files)) {
+            uploadedFiles = result.files;
+        } else if (Array.isArray(result)) {
+            uploadedFiles = result;
+        } else if (result.url || result.file_path) {
+            uploadedFiles = [result];
+        }
+
+        if (uploadedFiles.length > 0) {
+            albums = await window.albumService.addPhotos(albums, currentAlbumId, uploadedFiles);
+            const updatedAlbum = albums.find(a => a.id === currentAlbumId);
+            if (updatedAlbum) {
+                renderAlbumPhotos(updatedAlbum);
+            }
+            showToast(t('photos_added', currentAppLang) || 'Photos added successfully!', 'success');
+        } else {
+            showToast('Failed to upload photos.', 'error');
+        }
+    } catch (error) {
+        console.error('Error uploading photos:', error);
+        showToast('Error uploading photos.', 'error');
+    }
+
+    // Reset input
+    event.target.value = '';
+}
+

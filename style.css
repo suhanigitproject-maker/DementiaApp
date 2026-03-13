@@ -3409,3 +3409,93 @@ html[dir="rtl"] .profile-entry-header {
 .empty-state p {
     font-size: 0.95rem;
 }
+
+/* ===================================
+   ALBUMS TAB STYLES
+   =================================== */
+
+.album-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.album-preview {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--color-gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.album-preview.empty {
+    background-color: var(--color-gray-50);
+}
+
+.album-card .content-card-body {
+    padding: var(--card-padding, 1.25rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.albums-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.album-photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    background-color: var(--color-gray-100);
+    border: var(--card-border, 1px solid #e5e7eb);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.album-photo-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.album-photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.delete-photo-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.delete-photo-btn:hover {
+    background-color: var(--color-red);
+}
+
+.album-photo-item:hover .delete-photo-btn {
+    opacity: 1;
+}
