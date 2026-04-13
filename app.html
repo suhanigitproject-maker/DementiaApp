@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-512.png">
     <meta name="description"
         content="A compassionate AI memory companion for elderly people, helping organize routines, preserve memories, and stay connected with family.">
     <title>Aegis AI</title>
@@ -739,12 +742,20 @@
                     <div class="form-group">
                         <label for="routine-reminder" data-i18n="routine_label_reminder">Reminder</label>
                         <select id="routine-reminder">
-                            <option value="0" data-i18n="reminder_none">None</option>
+                            <option value="0" data-i18n="reminder_none">At time of routine</option>
                             <option value="5" data-i18n="reminder_5">5 minutes before</option>
                             <option value="10" data-i18n="reminder_10">10 minutes before</option>
                             <option value="15" data-i18n="reminder_15">15 minutes before</option>
                             <option value="30" data-i18n="reminder_30">30 minutes before</option>
                             <option value="60" data-i18n="reminder_60">1 hour before</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="routine-ringtone" data-i18n="routine_label_ringtone">Alarm Ringtone</label>
+                        <select id="routine-ringtone">
+                            <option value="default.mp3" data-i18n="ringtone_default">Default Chime</option>
+                            <option value="gentle.mp3" data-i18n="ringtone_gentle">Gentle Harp</option>
+                            <option value="alert.mp3" data-i18n="ringtone_alert">Loud Alert</option>
                         </select>
                     </div>
                     <div class="form-group">

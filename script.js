@@ -782,6 +782,7 @@ function openRoutineModal(id = null) {
             document.getElementById('routine-time').value = routine.time;
             document.getElementById('routine-description').value = routine.description || '';
             document.getElementById('routine-reminder').value = routine.reminder || '0';
+            document.getElementById('routine-ringtone').value = routine.ringtone || 'default.mp3';
 
             routine.days.forEach(day => {
                 const btn = document.querySelector(`.day-button[data-day="${day}"]`);
@@ -805,6 +806,7 @@ async function saveRoutine() {
     const time = document.getElementById('routine-time').value;
     const description = document.getElementById('routine-description').value;
     const reminder = document.getElementById('routine-reminder').value;
+    const ringtone = document.getElementById('routine-ringtone').value;
     const mediaInput = document.getElementById('routine-media');
 
     const selectedDays = Array.from(document.querySelectorAll('.day-button.selected'))
@@ -857,6 +859,7 @@ async function saveRoutine() {
         description,
         time,
         reminder,
+        ringtone,
         days: selectedDays,
         mediaPath,
         paused: id ? (routines.find(r => r.id === id)?.paused || false) : false,
@@ -920,6 +923,78 @@ async function syncRoutines() {
     } catch (error) {
         console.error('Error syncing routines:', error);
     }
+}
+
+// ===================================
+// ROUTINE REMINDERS
+// ===================================
+function setupRoutineReminders() {
+    if ("Notification" in window) {
+        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+    }
+    
+    // Check every minute
+    setInterval(() => {
+        const now = new Date();
+        const currentHours = now.getHours().toString().padStart(2, '0');
+        const currentMinutes = now.getMinutes().toString().padStart(2, '0');
+        const currentTimeString = `${currentHours}:${currentMinutes}`;
+        
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const todayStr = dayNames[now.getDay()];
+        
+        if (typeof routines === 'undefined') return;
+
+        routines.forEach(routine => {
+            if (routine.paused) return; // Skip paused
+            if (!routine.days || !routine.days.includes(todayStr)) return; // Not today
+            
+            const timeParts = routine.time.split(':');
+            if (timeParts.length !== 2) return;
+            
+            let triggerDate = new Date(now);
+            triggerDate.setHours(parseInt(timeParts[0], 10));
+            triggerDate.setMinutes(parseInt(timeParts[1], 10));
+            triggerDate.setSeconds(0);
+            triggerDate.setMilliseconds(0);
+            
+            // Subtract reminder minutes
+            const reminderMins = parseInt(routine.reminder || '0', 10);
+            triggerDate.setMinutes(triggerDate.getMinutes() - reminderMins);
+            
+            const targetHours = triggerDate.getHours().toString().padStart(2, '0');
+            const targetMinutes = triggerDate.getMinutes().toString().padStart(2, '0');
+            const targetTimeString = `${targetHours}:${targetMinutes}`;
+            
+            if (targetTimeString === currentTimeString) {
+                const todayFormatted = now.toISOString().split('T')[0];
+                if (routine._lastNotified === todayFormatted) return;
+                routine._lastNotified = todayFormatted;
+
+                // Push notification
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification("Aegis AI", {
+                        body: `⏰ It's time: ${routine.title}`,
+                        icon: '/icon-512.png'
+                    });
+                }
+                
+                // Visual Toast (app is open)
+                if (typeof showToast === 'function') {
+                    showToast(`⏰ It's time: ${routine.title}`, 'info', 10000);
+                }
+
+                // Audio Ringtone
+                try {
+                    const audioFile = routine.ringtone || 'default.mp3';
+                    const audio = new Audio(`/${audioFile}`);
+                    audio.play().catch(e => console.log('Audio autoplay blocked or file missing', e));
+                } catch(e) {}
+            }
+        });
+    }, 60000); 
 }
 
 // ===================================
@@ -2313,6 +2388,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Render Home tab dashboard
     renderHomeTab();
+    
+    // Start routine reminders
+    setupRoutineReminders();
 });
 
 // ===================================
@@ -3263,3 +3341,15 @@ async function handleAlbumPhotoUpload(event) {
     event.target.value = '';
 }
 
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, err => {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+  });
+}

@@ -656,7 +656,7 @@ LANGUAGE SETTINGS:
                 print(f"Detected potential data: {extracted_data}")
                 if memory_to_confirm:
                     print(f"Memory to confirm (Double Mention): {memory_to_confirm}")
-                if memory_actions.get('surfaced_memory'):
+                if memory_actions and memory_actions.get('surfaced_memory'):
                     print(f"Surfaced memory: {memory_actions['surfaced_memory']} (mode: {memory_actions.get('surfacing_mode')})")
                 
             else:
@@ -674,7 +674,7 @@ LANGUAGE SETTINGS:
         final_response = {
             'message': conversational_response,
             'extracted_data': extracted_data,
-            'memory_actions': memory_actions,
+            'memory_actions': memory_actions or {},
             'memory_to_confirm': memory_to_confirm,  # Non-null = Double Mention Rule fired
             'timestamp': datetime.now().isoformat()
         }

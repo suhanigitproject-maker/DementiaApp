@@ -1,0 +1,17 @@
+{
+  "name": "Aegis AI",
+  "short_name": "Aegis",
+  "description": "A compassionate AI memory companion for elderly people",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
