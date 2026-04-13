@@ -990,7 +990,21 @@ function setupRoutineReminders() {
                 try {
                     const audioFile = routine.ringtone || 'default.mp3';
                     const audio = new Audio(`/${audioFile}`);
-                    audio.play().catch(e => console.log('Audio autoplay blocked or file missing', e));
+                    audio.play().catch(e => {
+                        console.log('Audio autoplay blocked or file missing', e);
+                        // Synthesize a fallback beep if file is missing
+                        try {
+                            const actx = new (window.AudioContext || window.webkitAudioContext)();
+                            const osc = actx.createOscillator();
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(880, actx.currentTime); // A5 frequency
+                            osc.connect(actx.destination);
+                            osc.start();
+                            osc.stop(actx.currentTime + 1.5);
+                        } catch(err) {
+                            console.log('AudioContext fallback failed', err);
+                        }
+                    });
                 } catch(e) {}
             }
         });
