@@ -5,6 +5,8 @@ from datetime import datetime
 import os
 import json
 import uuid
+import redis
+import urllib.parse
 
 app = Flask(__name__)
 # Enable CORS with proper configuration for preflight requests
@@ -40,6 +42,14 @@ IS_VERCEL = os.environ.get("VERCEL") == "1"
 KV_REST_API_URL = os.environ.get("KV_REST_API_URL", "").rstrip('/')
 KV_REST_API_TOKEN = os.environ.get("KV_REST_API_TOKEN", "")
 BLOB_READ_WRITE_TOKEN = os.environ.get("BLOB_READ_WRITE_TOKEN", "")
+REDIS_URL = os.environ.get("REDIS_URL", "")
+
+redis_client = None
+if REDIS_URL:
+    try:
+        redis_client = redis.from_url(REDIS_URL)
+    except Exception as e:
+        print("Redis connection error:", e)
 
 def get_read_path(base_path):
     if IS_VERCEL:
@@ -54,10 +64,20 @@ def get_write_path(base_path):
     return base_path
 
 def kv_get(key, default_val=None):
+    if redis_client:
+        try:
+            val = redis_client.get(key)
+            if val is not None:
+                return json.loads(val)
+            return default_val
+        except Exception as e:
+            print("Redis get error:", e)
+            return default_val
+            
     if not KV_REST_API_URL or not KV_REST_API_TOKEN:
         return default_val
     try:
-        url = f"{KV_REST_API_URL}/get/{key}"
+        url = f"{KV_REST_API_URL}/get/{urllib.parse.quote(key, safe='')}"
         headers = {"Authorization": f"Bearer {KV_REST_API_TOKEN}"}
         r = requests.get(url, headers=headers)
         if r.status_code == 200:
@@ -69,10 +89,18 @@ def kv_get(key, default_val=None):
     return default_val
 
 def kv_set(key, val):
+    if redis_client:
+        try:
+            redis_client.set(key, json.dumps(val))
+            return True
+        except Exception as e:
+            print("Redis set error:", e)
+            return False
+            
     if not KV_REST_API_URL or not KV_REST_API_TOKEN:
         return False
     try:
-        url = f"{KV_REST_API_URL}/set/{key}"
+        url = f"{KV_REST_API_URL}/set/{urllib.parse.quote(key, safe='')}"
         headers = {"Authorization": f"Bearer {KV_REST_API_TOKEN}"}
         r = requests.post(url, headers=headers, data=json.dumps(val))
         return r.status_code == 200
@@ -81,7 +109,7 @@ def kv_set(key, val):
     return False
 
 def read_data(file_name, default_val):
-    if KV_REST_API_URL:
+    if REDIS_URL or KV_REST_API_URL:
         kv_data = kv_get(file_name)
         if kv_data is not None:
             return kv_data
@@ -97,7 +125,7 @@ def read_data(file_name, default_val):
     return default_val
 
 def write_data(file_name, data):
-    if KV_REST_API_URL:
+    if REDIS_URL or KV_REST_API_URL:
         if kv_set(file_name, data):
             return
             
