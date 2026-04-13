@@ -37,6 +37,10 @@ GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.
 # Vercel Serverless Function Compatibility
 IS_VERCEL = os.environ.get("VERCEL") == "1"
 
+KV_REST_API_URL = os.environ.get("KV_REST_API_URL", "").rstrip('/')
+KV_REST_API_TOKEN = os.environ.get("KV_REST_API_TOKEN", "")
+BLOB_READ_WRITE_TOKEN = os.environ.get("BLOB_READ_WRITE_TOKEN", "")
+
 def get_read_path(base_path):
     if IS_VERCEL:
         tmp_path = os.path.join("/tmp", os.path.basename(base_path))
@@ -48,6 +52,72 @@ def get_write_path(base_path):
     if IS_VERCEL:
         return os.path.join("/tmp", os.path.basename(base_path))
     return base_path
+
+def kv_get(key, default_val=None):
+    if not KV_REST_API_URL or not KV_REST_API_TOKEN:
+        return default_val
+    try:
+        url = f"{KV_REST_API_URL}/get/{key}"
+        headers = {"Authorization": f"Bearer {KV_REST_API_TOKEN}"}
+        r = requests.get(url, headers=headers)
+        if r.status_code == 200:
+            data = r.json()
+            if data and data.get("result"):
+                return json.loads(data["result"])
+    except Exception as e:
+        print(f"KV Get Error: {e}")
+    return default_val
+
+def kv_set(key, val):
+    if not KV_REST_API_URL or not KV_REST_API_TOKEN:
+        return False
+    try:
+        url = f"{KV_REST_API_URL}/set/{key}"
+        headers = {"Authorization": f"Bearer {KV_REST_API_TOKEN}"}
+        r = requests.post(url, headers=headers, data=json.dumps(val))
+        return r.status_code == 200
+    except Exception as e:
+        print(f"KV Set Error: {e}")
+    return False
+
+def read_data(file_name, default_val):
+    if KV_REST_API_URL:
+        kv_data = kv_get(file_name)
+        if kv_data is not None:
+            return kv_data
+        return default_val
+        
+    read_path = get_read_path(file_name)
+    if os.path.exists(read_path):
+        with open(read_path, 'r') as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                pass
+    return default_val
+
+def write_data(file_name, data):
+    if KV_REST_API_URL:
+        if kv_set(file_name, data):
+            return
+            
+    write_path = get_write_path(file_name)
+    os.makedirs(os.path.dirname(write_path) if os.path.dirname(write_path) else '.', exist_ok=True)
+    with open(write_path, 'w') as f:
+        json.dump(data, f, indent=2)
+
+def upload_to_blob(filename, file_content):
+    if not BLOB_READ_WRITE_TOKEN:
+        return None
+    url = f"https://blob.vercel-storage.com/{filename}"
+    headers = {
+        "authorization": f"Bearer {BLOB_READ_WRITE_TOKEN}",
+        "x-api-version": "7"
+    }
+    r = requests.put(url, headers=headers, data=file_content)
+    if r.status_code == 200:
+        return r.json().get("url")
+    return None
 
 # File paths
 MEMORIES_FILE = "memories.json"
@@ -263,133 +333,54 @@ DEFAULT_MEMORIES = {
 }
 
 def load_memories():
-    """Load memories from JSON file, ensuring all fields exist"""
+    """Load memories from JSON or KV, ensuring all fields exist"""
     memories = DEFAULT_MEMORIES.copy()
-    read_path = get_read_path(MEMORIES_FILE)
-    if os.path.exists(read_path):
-        try:
-            with open(read_path, 'r') as f:
-                loaded_data = json.load(f)
-                # Update default structure with loaded data (preserves defaults for missing keys)
-                memories.update(loaded_data)
-                
-                # Ensure adaptive_categories is a dict if it exists but is extracted incorrectly or missing
-                if "adaptive_categories" not in memories or not isinstance(memories["adaptive_categories"], dict):
-                    memories["adaptive_categories"] = {}
-                    
-        except json.JSONDecodeError:
-            pass
+    loaded_data = read_data(MEMORIES_FILE, {})
+    if loaded_data:
+        memories.update(loaded_data)
+    if "adaptive_categories" not in memories or not isinstance(memories["adaptive_categories"], dict):
+        memories["adaptive_categories"] = {}
     return memories
 
 def save_memories(memories_data):
-    """Save memories to JSON file"""
+    """Save memories"""
     memories_data["last_updated"] = datetime.now().isoformat()
-    write_path = get_write_path(MEMORIES_FILE)
-    with open(write_path, 'w') as f:
-        json.dump(memories_data, f, indent=2)
+    write_data(MEMORIES_FILE, memories_data)
 
 def load_profile():
-    """Load profile from JSON file"""
-    read_path = get_read_path(PROFILE_FILE)
-    if os.path.exists(read_path):
-        try:
-            with open(read_path, 'r') as f:
-                return json.load(f)
-        except json.JSONDecodeError:
-            pass
-    return {
-        "name": "",
-        "age": "",
-        "gender": "",
-        "medical_conditions": "",
-        "emergency_contact": "",
-        "hobbies": "",
-        "notes": ""
-    }
+    return read_data(PROFILE_FILE, {
+        "name": "", "age": "", "gender": "", "medical_conditions": "",
+        "emergency_contact": "", "hobbies": "", "notes": ""
+    })
 
 def save_profile(profile_data):
-    """Save profile to JSON file"""
-    write_path = get_write_path(PROFILE_FILE)
-    with open(write_path, 'w') as f:
-        json.dump(profile_data, f, indent=2)
+    write_data(PROFILE_FILE, profile_data)
 
 def load_routines():
-    """Load routines from JSON file"""
-    read_path = get_read_path(ROUTINES_FILE)
-    if os.path.exists(read_path):
-        try:
-            with open(read_path, 'r') as f:
-                data = json.load(f)
-                # Ensure it's a list
-                if isinstance(data, list):
-                    return data
-                # If it's the old dict format, verify and return empty list or migrate?
-                # For now, just return empty list to reset if schema mismatch
-                return []
-        except json.JSONDecodeError:
-            pass
-    return []
+    data = read_data(ROUTINES_FILE, [])
+    return data if isinstance(data, list) else []
 
 def save_routines(routines_data):
-    """Save routines to JSON file"""
-    write_path = get_write_path(ROUTINES_FILE)
-    with open(write_path, 'w') as f:
-        json.dump(routines_data, f, indent=2)
+    write_data(ROUTINES_FILE, routines_data)
 
 def load_family():
-    """Load family data from JSON file"""
-    read_path = get_read_path(FAMILY_FILE)
-    if os.path.exists(read_path):
-        try:
-            with open(read_path, 'r') as f:
-                data = json.load(f)
-                if isinstance(data, list):
-                    return data
-                return []
-        except json.JSONDecodeError:
-            pass
-    return []
-
-def load_chat_history_data():
-    """Load chat history from JSON file"""
-    read_path = get_read_path(CHAT_FILE)
-    if os.path.exists(read_path):
-        try:
-            with open(read_path, 'r') as f:
-                return json.load(f)
-        except json.JSONDecodeError:
-            pass
-    return []
+    data = read_data(FAMILY_FILE, [])
+    return data if isinstance(data, list) else []
 
 def save_family(family_data):
-    """Save family data to JSON file"""
-    write_path = get_write_path(FAMILY_FILE)
-    with open(write_path, 'w') as f:
-        json.dump(family_data, f, indent=2)
+    write_data(FAMILY_FILE, family_data)
+
+def load_chat_history_data():
+    return read_data(CHAT_FILE, [])
 
 def load_albums():
-    """Load albums data from JSON file"""
-    read_path = get_read_path(ALBUMS_FILE)
-    if os.path.exists(read_path):
-        try:
-            with open(read_path, 'r') as f:
-                data = json.load(f)
-                if isinstance(data, dict):
-                    return data
-                # migrate from old array
-                if isinstance(data, list):
-                    return {"albums": data}
-                return {"albums": []}
-        except json.JSONDecodeError:
-            pass
-    return {"albums": []}
+    data = read_data(ALBUMS_FILE, {"albums": []})
+    if isinstance(data, list):
+        return {"albums": data}
+    return data
 
 def save_albums(albums_data):
-    """Save albums data to JSON file"""
-    write_path = get_write_path(ALBUMS_FILE)
-    os.makedirs(os.path.dirname(write_path) if os.path.dirname(write_path) else '.', exist_ok=True)
-    with open(write_path, 'w') as f:
-        json.dump(albums_data, f, indent=2)
+    write_data(ALBUMS_FILE, albums_data)
 
 def merge_extracted_data(existing_data, new_data):
     """Merge new extracted data with existing memories"""
@@ -703,9 +694,7 @@ LANGUAGE SETTINGS:
                 'content': conversational_response
             })
             
-            write_path = get_write_path(CHAT_FILE)
-            with open(write_path, 'w') as f:
-                json.dump(full_chat_history, f, indent=4)
+            write_data(CHAT_FILE, full_chat_history)
         except Exception as e:
             print(f"Error saving automatic chat history: {e}")
         
@@ -728,9 +717,7 @@ def save_chat():
         if not chat_data:
             return jsonify({'error': 'No chat data provided'}), 400
             
-        write_path = get_write_path(CHAT_FILE)
-        with open(write_path, 'w') as f:
-            json.dump(chat_data, f, indent=4)
+        write_data(CHAT_FILE, chat_data)
         return jsonify({'message': 'Chat saved successfully!'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -777,12 +764,8 @@ def handle_notes():
     """
     try:
         # Load existing notes
-        notes_list = []
-        read_path = get_read_path(NOTES_FILE)
-        if os.path.exists(read_path):
-            with open(read_path, 'r') as f:
-                data = json.load(f)
-                notes_list = data.get('notes', []) if isinstance(data, dict) else data
+        data = read_data(NOTES_FILE, {'notes': []})
+        notes_list = data.get('notes', []) if isinstance(data, dict) else data
 
         if request.method == 'GET':
             return jsonify(notes_list)
@@ -791,9 +774,7 @@ def handle_notes():
         body = request.get_json()
         if isinstance(body, list):
             # Replace entire list (bulk sync)
-            write_path = get_write_path(NOTES_FILE)
-            with open(write_path, 'w') as f:
-                json.dump({'notes': body}, f, indent=2)
+            write_data(NOTES_FILE, {'notes': body})
             return jsonify({'status': 'success', 'notes': body})
 
         # Single new note
@@ -804,9 +785,7 @@ def handle_notes():
             'created_at': datetime.now().isoformat()
         }
         notes_list.append(new_note)
-        write_path = get_write_path(NOTES_FILE)
-        with open(write_path, 'w') as f:
-            json.dump({'notes': notes_list}, f, indent=2)
+        write_data(NOTES_FILE, {'notes': notes_list})
         return jsonify({'status': 'success', 'note': new_note})
 
     except Exception as e:
@@ -950,8 +929,21 @@ def upload_file():
             continue
         if file:
             filename = str(uuid.uuid4()) + "_" + file.filename
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            result.append({'url': f'/uploads/{filename}'})
+            file_content = file.read()
+            if BLOB_READ_WRITE_TOKEN:
+                blob_url = upload_to_blob(filename, file_content)
+                if blob_url:
+                    result.append({'url': blob_url})
+                else:
+                    return jsonify({'error': 'Failed to upload to Vercel Blob'}), 500
+            else:
+                try:
+                    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+                except OSError:
+                    pass
+                with open(os.path.join(UPLOAD_FOLDER, filename), 'wb') as f:
+                    f.write(file_content)
+                result.append({'url': f'/uploads/{filename}'})
             
     if not result:
         return jsonify({'error': 'No selected file or invalid files'}), 400
